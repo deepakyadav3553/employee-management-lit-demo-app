@@ -1,0 +1,25 @@
+{
+  "name": "employee-management-lit-demo-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Employee Management Lit Demo App",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc -p tsconfig.build.json --watch",
+    "serve": "wds --node-resolve --watch --open",
+    "test": "wtr",
+    "test:watch": "wtr --watch"
+  },
+  "dependencies": {
+    "lit": "^3.2.0"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@types/mocha": "^10.0.0",
+    "@web/dev-server": "^0.4.6",
+    "@web/dev-server-esbuild": "^1.0.5",
+    "@web/test-runner": "^0.19.0",
+    "typescript": "~5.9.0"
+  }
+}
