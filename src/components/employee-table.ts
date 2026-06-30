@@ -305,34 +305,24 @@ export class EmployeeTable extends LitElement {
 
   /** Append 10 generated dummy employees and persist them to localStorage. */
   private addDummyRecords(): void {
-    const departments = [
-      'Engineering',
-      'HR',
-      'Finance',
-      'Marketing',
-      'Sales',
-      'Operations',
-    ];
-    const designations = [
-      'Developer',
-      'Manager',
-      'Analyst',
-      'Designer',
-      'Coordinator',
-      'Specialist',
-    ];
-    const dummies: Employee[] = Array.from({length: 10}, (_, i) => {
-      const n = this.employees.length + i + 1;
-      const department = departments[i % departments.length];
-      const designation = designations[i % designations.length];
-      return {
-        id: generateId(),
-        name: `Employee ${n}`,
-        department,
-        designation,
-        email: `employee${n}@example.com`,
-      };
-    });
+    const dummies: Employee[] = [
+      {name: 'Olivia Bennett', department: 'Engineering', designation: 'Developer'},
+      {name: 'Liam Carter', department: 'HR', designation: 'Manager'},
+      {name: 'Sophia Nguyen', department: 'Finance', designation: 'Analyst'},
+      {name: 'Noah Patel', department: 'Marketing', designation: 'Designer'},
+      {name: 'Ava Rodriguez', department: 'Sales', designation: 'Coordinator'},
+      {name: 'Ethan Walsh', department: 'Operations', designation: 'Specialist'},
+      {name: 'Isabella Rossi', department: 'Engineering', designation: 'Tech Lead'},
+      {name: 'Mason Clarke', department: 'Finance', designation: 'Accountant'},
+      {name: 'Mia Andersen', department: 'Marketing', designation: 'Brand Manager'},
+      {name: 'Lucas Fischer', department: 'Sales', designation: 'Account Executive'},
+    ].map(({name, department, designation}) => ({
+      id: generateId(),
+      name,
+      department,
+      designation,
+      email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+    }));
     this.employees = [...this.employees, ...dummies];
     this.persist();
   }
