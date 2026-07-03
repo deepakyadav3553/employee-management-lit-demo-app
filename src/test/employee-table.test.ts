@@ -55,7 +55,7 @@ describe('employee-table', () => {
   it('clears the form after a successful save', async () => {
     const el = await createElement();
     setInput(el, 'name', 'Temp Person');
-    setInput(el, 'department', 'Ops');
+    setInput(el, 'department', 'Operations');
     setInput(el, 'designation', 'Lead');
     setInput(el, 'email', 'temp@example.com');
     // Flush the render so the inputs reflect the typed values before saving,
@@ -74,7 +74,7 @@ describe('employee-table', () => {
     const startCount = rows(el).length;
 
     setInput(el, 'name', 'Test User');
-    setInput(el, 'department', 'QA');
+    setInput(el, 'department', 'Marketing');
     setInput(el, 'designation', 'Tester');
     setInput(el, 'email', 'not-an-email');
     submit(el);

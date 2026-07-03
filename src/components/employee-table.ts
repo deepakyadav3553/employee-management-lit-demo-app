@@ -18,6 +18,15 @@ function emptyDraft(): EmployeeDraft {
 
 const STORAGE_KEY = 'employee-management:employees';
 
+const DEPARTMENTS = [
+  'Engineering',
+  'HR',
+  'Finance',
+  'Marketing',
+  'Sales',
+  'Operations',
+];
+
 function generateId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
@@ -89,9 +98,18 @@ export class EmployeeTable extends LitElement {
       border-radius: 6px;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       outline: 2px solid #93c5fd;
       border-color: #2563eb;
+    }
+
+    select {
+      font: inherit;
+      padding: 0.5rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
     }
 
     .error {
@@ -238,7 +256,8 @@ export class EmployeeTable extends LitElement {
   }
 
   private handleInput(field: keyof EmployeeDraft, event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+    const value = (event.target as HTMLInputElement | HTMLSelectElement)
+      .value;
     this.draft = {...this.draft, [field]: value};
   }
 
@@ -341,7 +360,7 @@ export class EmployeeTable extends LitElement {
         <form @submit=${this.save}>
           <div class="form-grid">
             ${this.renderField('name', 'Name', 'Enter name')}
-            ${this.renderField('department', 'Department', 'Enter department')}
+            ${this.renderDepartmentField()}
             ${this.renderField(
               'designation',
               'Designation',
@@ -377,6 +396,35 @@ export class EmployeeTable extends LitElement {
           .value=${this.draft[field]}
           @input=${(e: Event) => this.handleInput(field, e)}
         />
+        ${error ? html`<span class="error">${error}</span>` : nothing}
+      </div>
+    `;
+  }
+
+  private renderDepartmentField() {
+    const error = this.errors.department;
+    return html`
+      <div class="field">
+        <label for="department">Department</label>
+        <select
+          id="department"
+          .value=${this.draft.department}
+          @input=${(e: Event) => this.handleInput('department', e)}
+        >
+          <option value="" disabled ?selected=${!this.draft.department}>
+            Select department
+          </option>
+          ${DEPARTMENTS.map(
+            (department) => html`
+              <option
+                value=${department}
+                ?selected=${this.draft.department === department}
+              >
+                ${department}
+              </option>
+            `
+          )}
+        </select>
         ${error ? html`<span class="error">${error}</span>` : nothing}
       </div>
     `;
