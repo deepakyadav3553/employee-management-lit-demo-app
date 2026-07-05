@@ -10,10 +10,14 @@ export interface Employee {
 export type EmployeeDraft = Omit<Employee, 'id'>;
 
 export function emptyDraft(): EmployeeDraft {
-  return {
-    name: '',
-    department: '',
-    designation: '',
-    email: '',
-  };
+  return {name: '', department: '', designation: '', email: ''};
 }
+
+export const DEPARTMENTS = [
+  'Engineering',
+  'HR',
+  'Finance',
+  'Marketing',
+  'Sales',
+  'Operations',
+];
