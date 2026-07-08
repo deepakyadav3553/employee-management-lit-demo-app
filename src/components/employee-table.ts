@@ -78,27 +78,27 @@ export class EmployeeTable extends LitElement {
       gap: 0.4rem;
     }
 
-    .btn-edit {
-      background: #2563eb;
-      color: #fff;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.8rem;
-    }
-
-    .btn-edit:hover {
-      background: #1d4ed8;
-    }
-
+    .btn-edit,
     .btn-delete {
-      background: #fef2f2;
-      color: #dc2626;
-      border-color: #fecaca;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem;
+      line-height: 0;
     }
 
+    .btn-edit:hover,
     .btn-delete:hover {
-      background: #fee2e2;
+      background: #f1f5f9;
+    }
+
+    .row-actions img {
+      width: 1rem;
+      height: 1rem;
+      display: block;
     }
 
     .empty {
@@ -154,16 +154,20 @@ export class EmployeeTable extends LitElement {
                         <div class="row-actions">
                           <button
                             class="btn-edit"
+                            title="Edit"
+                            aria-label="Edit"
                             @click=${() => this.emit('employee-edit', employee)}
                           >
-                            Edit
+                            <img src="/assets/icons/edit.svg" alt="Edit" />
                           </button>
                           <button
                             class="btn-delete"
+                            title="Delete"
+                            aria-label="Delete"
                             @click=${() =>
                               this.emit('employee-delete', employee)}
                           >
-                            Delete
+                            <img src="/assets/icons/trash.svg" alt="Delete" />
                           </button>
                         </div>
                       </td>
