@@ -12,7 +12,7 @@ export class ConfirmModal extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 16px;
       z-index: 1000;
     }
 
@@ -22,7 +22,7 @@ export class ConfirmModal extends LitElement {
       box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
       width: 100%;
       max-width: 420px;
-      padding: 1.5rem;
+      padding: 24px;
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #1f2933;
     }
@@ -31,11 +31,11 @@ export class ConfirmModal extends LitElement {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 16px;
     }
 
     .title {
-      font-size: 1.1rem;
+      font-size: 18px;
       font-weight: 600;
       margin: 0;
     }
@@ -44,10 +44,10 @@ export class ConfirmModal extends LitElement {
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 1.25rem;
+      font-size: 20px;
       line-height: 1;
       color: #94a3b8;
-      padding: 0.15rem;
+      padding: 2px;
       border-radius: 4px;
     }
 
@@ -57,14 +57,14 @@ export class ConfirmModal extends LitElement {
     }
 
     .body {
-      margin: 0.75rem 0 1.5rem;
+      margin: 12px 0 24px;
       color: #64748b;
-      font-size: 0.95rem;
+      font-size: 15px;
     }
 
     .highlight {
       display: block;
-      margin-top: 0.25rem;
+      margin-top: 4px;
       color: #1f2933;
       font-weight: 600;
     }
@@ -72,7 +72,7 @@ export class ConfirmModal extends LitElement {
     .footer {
       display: flex;
       justify-content: flex-end;
-      gap: 0.6rem;
+      gap: 10px;
     }
   `;
 

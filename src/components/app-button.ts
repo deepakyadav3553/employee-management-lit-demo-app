@@ -17,7 +17,7 @@ export class AppButton extends LitElement {
       cursor: pointer;
       border: 1px solid transparent;
       border-radius: 6px;
-      padding: 0.5rem 1.35rem;
+      padding: 8px 22px;
       transition: background 0.15s;
     }
 
@@ -60,7 +60,7 @@ export class AppButton extends LitElement {
       justify-content: center;
       background: none;
       border-radius: 4px;
-      padding: 0.25rem;
+      padding: 4px;
       line-height: 0;
     }
 
@@ -69,8 +69,8 @@ export class AppButton extends LitElement {
     }
 
     ::slotted(img) {
-      width: 1rem;
-      height: 1rem;
+      width: 16px;
+      height: 16px;
       display: block;
     }
   `; 

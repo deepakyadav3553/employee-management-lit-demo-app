@@ -13,7 +13,7 @@ export class EmployeeTable extends LitElement {
     }
 
     h2 {
-      font-size: 1rem;
+      font-size: 16px;
       font-weight: 600;
       margin: 0;
     }
@@ -22,8 +22,8 @@ export class EmployeeTable extends LitElement {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     table {
@@ -38,14 +38,14 @@ export class EmployeeTable extends LitElement {
     th,
     td {
       text-align: left;
-      padding: 0.65rem 0.85rem;
+      padding: 10px 14px;
       border-bottom: 1px solid #eef2f7;
-      font-size: 0.9rem;
+      font-size: 14px;
     }
 
     th {
       background: #f8fafc;
-      font-size: 0.75rem;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       color: #64748b;
@@ -57,13 +57,13 @@ export class EmployeeTable extends LitElement {
 
     .row-actions {
       display: flex;
-      gap: 0.4rem;
+      gap: 6px;
     }
 
     .empty {
       text-align: center;
       color: #64748b;
-      padding: 2rem;
+      padding: 32px;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
     }

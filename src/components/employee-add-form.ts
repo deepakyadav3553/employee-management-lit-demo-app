@@ -20,17 +20,17 @@ export class EmployeeAddForm extends LitElement {
     .form-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      gap: 16px;
     }
 
     .field {
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 6px;
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: 14px;
       font-weight: 600;
       color: #374151;
     }
@@ -38,7 +38,7 @@ export class EmployeeAddForm extends LitElement {
     input,
     select {
       font: inherit;
-      padding: 0.55rem 0.65rem;
+      padding: 9px 10px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       background: #fff;
@@ -59,13 +59,13 @@ export class EmployeeAddForm extends LitElement {
 
     .error {
       color: #dc2626;
-      font-size: 0.75rem;
+      font-size: 12px;
     }
 
     .form-actions {
       display: flex;
-      gap: 0.6rem;
-      margin-top: 1.25rem;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     @media (max-width: 720px) {
