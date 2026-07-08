@@ -1,10 +1,9 @@
 import {LitElement, html, css, nothing, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../types';
+import './app-button';
 
-/** Detail payload for the `employee-save` event. */
 export interface EmployeeSaveDetail {
-  /** Present when editing an existing employee; null when adding a new one. */
   id: string | null;
   draft: EmployeeDraft;
 }
@@ -69,35 +68,6 @@ export class EmployeeAddForm extends LitElement {
       margin-top: 1.25rem;
     }
 
-    button {
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 0.5rem 1.35rem;
-      transition: background 0.15s;
-    }
-
-    .primary {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .primary:hover {
-      background: #1d4ed8;
-    }
-
-    .secondary {
-      background: #f1f5f9;
-      border-color: #d1d5db;
-      color: #334155;
-    }
-
-    .secondary:hover {
-      background: #e2e8f0;
-    }
-
     @media (max-width: 720px) {
       .form-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -111,7 +81,6 @@ export class EmployeeAddForm extends LitElement {
     }
   `;
 
-  /** When set, the form edits this employee instead of adding a new one. */
   @property({attribute: false}) editing: Employee | null = null;
 
   @state() private draft: EmployeeDraft = emptyDraft();
@@ -194,12 +163,16 @@ export class EmployeeAddForm extends LitElement {
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary">
-            ${isEditing ? 'Update' : 'Save'}
-          </button>
-          <button type="button" class="secondary" @click=${this.handleClear}>
-            ${isEditing ? 'Cancel' : 'Clear'}
-          </button>
+          <app-button
+            variant="primary"
+            type="submit"
+            label=${isEditing ? 'Update' : 'Save'}
+          ></app-button>
+          <app-button
+            variant="secondary"
+            label=${isEditing ? 'Cancel' : 'Clear'}
+            @click=${this.handleClear}
+          ></app-button>
         </div>
       </form>
     `;

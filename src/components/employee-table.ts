@@ -1,6 +1,7 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {Employee} from '../types';
+import './app-button';
 
 @customElement('employee-table')
 export class EmployeeTable extends LitElement {
@@ -25,25 +26,6 @@ export class EmployeeTable extends LitElement {
       margin-bottom: 0.75rem;
     }
 
-    button {
-      font: inherit;
-      cursor: pointer;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 0.45rem 1rem;
-    }
-
-    .secondary {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-      color: #334155;
-    }
-
-    .secondary:hover {
-      background: #e2e8f0;
-    }
-
-    /* ---- Table ---- */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -78,29 +60,6 @@ export class EmployeeTable extends LitElement {
       gap: 0.4rem;
     }
 
-    .btn-edit,
-    .btn-delete {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      border-radius: 4px;
-      padding: 0.25rem;
-      line-height: 0;
-    }
-
-    .btn-edit:hover,
-    .btn-delete:hover {
-      background: #f1f5f9;
-    }
-
-    .row-actions img {
-      width: 1rem;
-      height: 1rem;
-      display: block;
-    }
-
     .empty {
       text-align: center;
       color: #64748b;
@@ -110,7 +69,6 @@ export class EmployeeTable extends LitElement {
     }
   `;
 
-  /** Employees to display; owned and supplied by the parent. */
   @property({attribute: false}) employees: Employee[] = [];
 
   private emit(type: string, detail?: unknown): void {
@@ -123,9 +81,11 @@ export class EmployeeTable extends LitElement {
     return html`
       <div class="list-header">
         <h2>Employee List</h2>
-        <button class="secondary" @click=${() => this.emit('add-dummies')}>
-          Add 5 Dummy Records
-        </button>
+        <app-button
+          variant="secondary"
+          label="Add 5 Dummy Records"
+          @click=${() => this.emit('add-dummies')}
+        ></app-button>
       </div>
       ${this.employees.length === 0
         ? html`<p class="empty">
@@ -152,23 +112,21 @@ export class EmployeeTable extends LitElement {
                       <td>${employee.email}</td>
                       <td>
                         <div class="row-actions">
-                          <button
-                            class="btn-edit"
-                            title="Edit"
-                            aria-label="Edit"
+                          <app-button
+                            variant="icon"
+                            label="Edit"
                             @click=${() => this.emit('employee-edit', employee)}
                           >
-                            <img src="/assets/icons/edit.svg" alt="Edit" />
-                          </button>
-                          <button
-                            class="btn-delete"
-                            title="Delete"
-                            aria-label="Delete"
+                            <img src="/assets/icons/edit.svg" alt="" />
+                          </app-button>
+                          <app-button
+                            variant="icon"
+                            label="Delete"
                             @click=${() =>
                               this.emit('employee-delete', employee)}
                           >
-                            <img src="/assets/icons/trash.svg" alt="Delete" />
-                          </button>
+                            <img src="/assets/icons/trash.svg" alt="" />
+                          </app-button>
                         </div>
                       </td>
                     </tr>

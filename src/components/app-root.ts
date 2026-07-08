@@ -46,7 +46,6 @@ export class AppRoot extends LitElement {
     this.employees = this.load();
   }
 
-  /** Read employees from localStorage; starts empty when none are stored. */
   private load(): Employee[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -55,17 +54,16 @@ export class AppRoot extends LitElement {
         if (Array.isArray(parsed)) return parsed;
       }
     } catch {
-      // Ignore storage/parse errors and start with an empty list.
+      return [];
     }
     return [];
   }
 
-  /** Persist the current employees to localStorage. */
   private persist(): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.employees));
     } catch {
-      // Storage may be unavailable; keep working with in-memory state.
+      return;
     }
   }
 

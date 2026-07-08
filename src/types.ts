@@ -6,7 +6,6 @@ export interface Employee {
   email: string;
 }
 
-/** The editable fields of an employee (everything except the generated id). */
 export type EmployeeDraft = Omit<Employee, 'id'>;
 
 export function emptyDraft(): EmployeeDraft {
