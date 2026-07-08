@@ -2,6 +2,7 @@ import {LitElement, html, css} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
 import './employee-add-form';
 import './employee-table';
+import './confirm-modal';
 import type {EmployeeSaveDetail} from './employee-add-form';
 import {Employee} from '../types';
 
@@ -40,6 +41,7 @@ export class AppRoot extends LitElement {
 
   @state() private employees: Employee[] = [];
   @state() private editing: Employee | null = null;
+  @state() private pendingDelete: Employee | null = null;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -85,11 +87,20 @@ export class AppRoot extends LitElement {
   }
 
   private handleDelete(event: CustomEvent<Employee>): void {
-    const employee = event.detail;
-    if (!confirm(`Delete ${employee.name}? This cannot be undone.`)) return;
+    this.pendingDelete = event.detail;
+  }
+
+  private confirmDelete(): void {
+    const employee = this.pendingDelete;
+    if (!employee) return;
     this.employees = this.employees.filter((e) => e.id !== employee.id);
     this.persist();
     if (this.editing?.id === employee.id) this.editing = null;
+    this.pendingDelete = null;
+  }
+
+  private cancelDelete(): void {
+    this.pendingDelete = null;
   }
 
   private handleCancel(): void {
@@ -132,6 +143,16 @@ export class AppRoot extends LitElement {
           @add-dummies=${this.addDummyRecords}
         ></employee-table>
       </div>
+      <confirm-modal
+        ?open=${this.pendingDelete !== null}
+        heading="Delete Employee"
+        message="Are you sure you want to delete"
+        highlight=${this.pendingDelete ? `${this.pendingDelete.name}?` : ''}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        @modal-confirm=${this.confirmDelete}
+        @modal-cancel=${this.cancelDelete}
+      ></confirm-modal>
     `;
   }
 }

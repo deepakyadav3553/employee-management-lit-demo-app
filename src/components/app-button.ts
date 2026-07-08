@@ -1,7 +1,7 @@
 import {LitElement, html, css, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'icon';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'icon';
 export type ButtonType = 'button' | 'submit' | 'reset';
 
 @customElement('app-button')
@@ -43,6 +43,15 @@ export class AppButton extends LitElement {
 
     .secondary:hover:not(:disabled) {
       background: #e2e8f0;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .danger:hover:not(:disabled) {
+      background: #b91c1c;
     }
 
     .icon {
