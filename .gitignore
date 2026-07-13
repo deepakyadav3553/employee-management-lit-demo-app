@@ -6,7 +6,7 @@
 # subdirectory into the repo root. Ignore those generated directories and
 # artifacts so only the source under src/ is committed.
 /components/
-/models/
+/types.js
 *.js.map
 *.d.ts
 *.tsbuildinfo

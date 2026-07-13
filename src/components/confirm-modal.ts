@@ -23,8 +23,6 @@ export class ConfirmModal extends LitElement {
       width: 100%;
       max-width: 420px;
       padding: 24px;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
     }
 
     .header {
@@ -76,7 +74,7 @@ export class ConfirmModal extends LitElement {
     }
   `;
 
-  @property({type: Boolean, reflect: true}) open = false;
+  @property({type: Boolean}) open = false;
   @property() heading = 'Confirm';
   @property() message = '';
   @property() highlight = '';

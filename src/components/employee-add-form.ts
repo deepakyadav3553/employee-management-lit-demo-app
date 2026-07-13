@@ -1,7 +1,9 @@
-import {LitElement, html, css, nothing, PropertyValues} from 'lit';
+import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../types';
 import './app-button';
+import './app-input';
+import type {InputChangeDetail} from './app-input';
 
 export interface EmployeeSaveDetail {
   id: string | null;
@@ -13,53 +15,12 @@ export class EmployeeAddForm extends LitElement {
   static override styles = css`
     :host {
       display: block;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
     }
 
     .form-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    input,
-    select {
-      font: inherit;
-      padding: 9px 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      background: #fff;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    input.invalid,
-    select.invalid {
-      border-color: #dc2626;
-    }
-
-    .error {
-      color: #dc2626;
-      font-size: 12px;
     }
 
     .form-actions {
@@ -94,9 +55,11 @@ export class EmployeeAddForm extends LitElement {
     }
   }
 
-  private handleInput(field: keyof EmployeeDraft, event: Event): void {
-    const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
-    this.draft = {...this.draft, [field]: value};
+  private handleInput(
+    field: keyof EmployeeDraft,
+    event: CustomEvent<InputChangeDetail>
+  ): void {
+    this.draft = {...this.draft, [field]: event.detail.value};
     if (this.errors[field]) {
       const {[field]: _removed, ...rest} = this.errors;
       this.errors = rest;
@@ -157,9 +120,11 @@ export class EmployeeAddForm extends LitElement {
       <form @submit=${this.handleSubmit} novalidate>
         <div class="form-grid">
           ${this.renderField('name', 'Name', 'Enter name')}
-          ${this.renderDepartmentField()}
+          ${this.renderField('department', 'Department', 'Select department', {
+            options: DEPARTMENTS,
+          })}
           ${this.renderField('designation', 'Designation', 'Enter designation')}
-          ${this.renderField('email', 'Email', 'Enter email', 'email')}
+          ${this.renderField('email', 'Email', 'Enter email', {type: 'email'})}
         </div>
 
         <div class="form-actions">
@@ -182,52 +147,19 @@ export class EmployeeAddForm extends LitElement {
     field: keyof EmployeeDraft,
     label: string,
     placeholder: string,
-    type = 'text'
+    {type = 'text', options = null}: {type?: string; options?: string[] | null} = {}
   ) {
-    const error = this.errors[field];
     return html`
-      <div class="field">
-        <label for=${field}>${label}</label>
-        <input
-          id=${field}
-          type=${type}
-          class=${error ? 'invalid' : ''}
-          placeholder=${placeholder}
-          .value=${this.draft[field]}
-          @input=${(e: Event) => this.handleInput(field, e)}
-        />
-        ${error ? html`<span class="error">${error}</span>` : nothing}
-      </div>
-    `;
-  }
-
-  private renderDepartmentField() {
-    const error = this.errors.department;
-    return html`
-      <div class="field">
-        <label for="department">Department</label>
-        <select
-          id="department"
-          class=${error ? 'invalid' : ''}
-          .value=${this.draft.department}
-          @change=${(e: Event) => this.handleInput('department', e)}
-        >
-          <option value="" disabled ?selected=${!this.draft.department}>
-            Select department
-          </option>
-          ${DEPARTMENTS.map(
-            (department) => html`
-              <option
-                value=${department}
-                ?selected=${this.draft.department === department}
-              >
-                ${department}
-              </option>
-            `
-          )}
-        </select>
-        ${error ? html`<span class="error">${error}</span>` : nothing}
-      </div>
+      <app-input
+        label=${label}
+        type=${type}
+        placeholder=${placeholder}
+        .options=${options}
+        .value=${this.draft[field]}
+        error=${this.errors[field] ?? ''}
+        @input-change=${(e: CustomEvent<InputChangeDetail>) =>
+          this.handleInput(field, e)}
+      ></app-input>
     `;
   }
 }

@@ -22,7 +22,6 @@ export class AppToast extends LitElement {
       flex-direction: column;
       gap: 10px;
       z-index: 1100;
-      font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
     .toast {

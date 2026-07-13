@@ -68,7 +68,7 @@ export class AppRoot extends LitElement {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.employees));
     } catch {
-      return;
+      // localStorage may be unavailable; the app still works in-memory
     }
   }
 

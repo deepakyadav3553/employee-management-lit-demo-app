@@ -2,7 +2,7 @@ import {LitElement, html, css, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'icon';
-export type ButtonType = 'button' | 'submit' | 'reset';
+export type ButtonType = 'button' | 'submit';
 
 @customElement('app-button')
 export class AppButton extends LitElement {
@@ -21,17 +21,12 @@ export class AppButton extends LitElement {
       transition: background 0.15s;
     }
 
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
     .primary {
       background: #2563eb;
       color: #fff;
     }
 
-    .primary:hover:not(:disabled) {
+    .primary:hover {
       background: #1d4ed8;
     }
 
@@ -41,7 +36,7 @@ export class AppButton extends LitElement {
       color: #334155;
     }
 
-    .secondary:hover:not(:disabled) {
+    .secondary:hover {
       background: #e2e8f0;
     }
 
@@ -50,7 +45,7 @@ export class AppButton extends LitElement {
       color: #fff;
     }
 
-    .danger:hover:not(:disabled) {
+    .danger:hover {
       background: #b91c1c;
     }
 
@@ -64,7 +59,7 @@ export class AppButton extends LitElement {
       line-height: 0;
     }
 
-    .icon:hover:not(:disabled) {
+    .icon:hover {
       background: #f1f5f9;
     }
 
@@ -73,32 +68,25 @@ export class AppButton extends LitElement {
       height: 16px;
       display: block;
     }
-  `; 
+  `;
+
   @property() variant: ButtonVariant = 'primary';
   @property() type: ButtonType = 'button';
-
-  @property({type: Boolean}) disabled = false;
-
   @property() label = '';
 
   private handleClick(): void {
-    if (this.disabled) return;
-    const form = this.closest('form');
-    if (!form) return;
-    if (this.type === 'submit') {
-      form.requestSubmit();
-    } else if (this.type === 'reset') {
-      form.reset();
-    }
+    if (this.type !== 'submit') return;
+    this.closest('form')?.requestSubmit();
   }
 
   override render() {
+    const iconLabel =
+      this.variant === 'icon' && this.label ? this.label : nothing;
     return html`
       <button
         class=${this.variant}
-        ?disabled=${this.disabled}
-        title=${this.variant === 'icon' && this.label ? this.label : nothing}
-        aria-label=${this.variant === 'icon' && this.label ? this.label : nothing}
+        title=${iconLabel}
+        aria-label=${iconLabel}
         @click=${this.handleClick}
       >
         <slot>${this.label}</slot>

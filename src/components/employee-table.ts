@@ -8,8 +8,6 @@ export class EmployeeTable extends LitElement {
   static override styles = css`
     :host {
       display: block;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
     }
 
     h2 {
