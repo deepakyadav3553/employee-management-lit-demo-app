@@ -1,15 +1,13 @@
 # Dependencies
 /node_modules/
 
-# Build output
-# `npm run build` (tsc) emits .js / .d.ts / .js.map mirroring each src/
-# subdirectory into the repo root. Ignore those generated directories and
-# artifacts so only the source under src/ is committed.
-/components/
-/types.js
-*.js.map
-*.d.ts
+# Build output — `npm run build` (tsc) emits compiled JS/maps/declarations
+# under ./dist, mirroring the src/ tree.
+/dist/
 *.tsbuildinfo
+
+# Test coverage
+/coverage/
 
 # Claude Code / local tooling
 .claude/

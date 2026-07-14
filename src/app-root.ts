@@ -1,12 +1,15 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, state, query} from 'lit/decorators.js';
-import './employee-add-form';
-import './employee-table';
-import './confirm-modal';
-import './app-toast';
-import type {EmployeeSaveDetail, EmployeeAddForm} from './employee-add-form';
-import type {AppToast} from './app-toast';
-import {Employee} from '../types';
+import './components/employee/employee-form';
+import './components/employee/employee-table';
+import './components/ui/confirm-modal';
+import './components/ui/app-toast';
+import type {
+  EmployeeSaveDetail,
+  EmployeeForm,
+} from './components/employee/employee-form';
+import type {AppToast} from './components/ui/app-toast';
+import {Employee} from './models/employee';
 
 const STORAGE_KEY = 'employee-management:employees';
 
@@ -90,15 +93,15 @@ export class AppRoot extends LitElement {
   @state() private employees: Employee[] = [];
   @state() private editing: Employee | null = null;
   @state() private pendingDelete: Employee | null = null;
-  @query('app-toast') private toaster!: AppToast;
-  @query('employee-add-form') private addForm!: EmployeeAddForm;
+  @query('app-toast') private toast!: AppToast;
+  @query('employee-form') private employeeForm!: EmployeeForm;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.employees = this.load();
+    this.employees = this.loadEmployees();
   }
 
-  private load(): Employee[] {
+  private loadEmployees(): Employee[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -111,7 +114,7 @@ export class AppRoot extends LitElement {
     return [];
   }
 
-  private persist(): void {
+  private persistEmployees(): void {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.employees));
     } catch {
@@ -125,12 +128,12 @@ export class AppRoot extends LitElement {
       this.employees = this.employees.map((e) =>
         e.id === id ? {id, ...draft} : e
       );
-      this.toaster.show('Employee updated successfully!', 'info');
+      this.toast.show('Employee updated successfully!', 'info');
     } else {
       this.employees = [...this.employees, {id: generateId(), ...draft}];
-      this.toaster.show('Employee added successfully!', 'success');
+      this.toast.show('Employee added successfully!', 'success');
     }
-    this.persist();
+    this.persistEmployees();
     this.editing = null;
   }
 
@@ -146,17 +149,17 @@ export class AppRoot extends LitElement {
     const employee = this.pendingDelete;
     if (!employee) return;
     this.employees = this.employees.filter((e) => e.id !== employee.id);
-    this.persist();
+    this.persistEmployees();
     if (this.editing?.id === employee.id) this.editing = null;
     this.pendingDelete = null;
-    this.toaster.show('Employee deleted successfully!', 'error');
+    this.toast.show('Employee deleted successfully!', 'error');
   }
 
   private cancelDelete(): void {
     this.pendingDelete = null;
   }
 
-  private handleCancel(): void {
+  private handleFormCancel(): void {
     this.editing = null;
   }
 
@@ -175,12 +178,12 @@ export class AppRoot extends LitElement {
       email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
     }));
     this.employees = [...this.employees, ...dummies];
-    this.persist();
+    this.persistEmployees();
   }
 
-  private handleAddClick(): void {
+  private handleAddRequest(): void {
     this.editing = null;
-    this.addForm?.focusFirst();
+    this.employeeForm?.focusFirstField();
   }
 
   override render() {
@@ -193,18 +196,18 @@ export class AppRoot extends LitElement {
           </div>
         </header>
         <div class="form-section">
-          <employee-add-form
+          <employee-form
             .editing=${this.editing}
             @employee-save=${this.handleSave}
-            @form-cancel=${this.handleCancel}
-          ></employee-add-form>
+            @form-cancel=${this.handleFormCancel}
+          ></employee-form>
         </div>
         <div class="table-section">
           <employee-table
             .employees=${this.employees}
             @employee-edit=${this.handleEdit}
             @employee-delete=${this.handleDelete}
-            @employee-add-request=${this.handleAddClick}
+            @employee-add-request=${this.handleAddRequest}
             @add-dummies=${this.addDummyRecords}
           ></employee-table>
         </div>

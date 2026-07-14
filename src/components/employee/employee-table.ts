@@ -1,10 +1,10 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {Employee} from '../types';
-import './app-button';
-import './app-pagination';
-import './empty-state';
-import type {PageChangeDetail} from './app-pagination';
+import {Employee} from '../../models/employee';
+import '../ui/app-button';
+import '../ui/app-pagination';
+import '../ui/empty-state';
+import type {PageChangeDetail} from '../ui/app-pagination';
 
 const PAGE_SIZE = 5;
 

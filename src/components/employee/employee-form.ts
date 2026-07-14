@@ -1,17 +1,17 @@
 import {LitElement, html, css, PropertyValues} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
-import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../types';
-import './app-button';
-import './app-input';
-import type {InputChangeDetail, InputIcon} from './app-input';
+import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../../models/employee';
+import '../ui/app-button';
+import '../ui/app-input';
+import type {InputChangeDetail, InputIcon} from '../ui/app-input';
 
 export interface EmployeeSaveDetail {
   id: string | null;
   draft: EmployeeDraft;
 }
 
-@customElement('employee-add-form')
-export class EmployeeAddForm extends LitElement {
+@customElement('employee-form')
+export class EmployeeForm extends LitElement {
   static override styles = css`
     :host {
       display: block;
@@ -148,7 +148,7 @@ export class EmployeeAddForm extends LitElement {
     `;
   }
 
-  focusFirst(): void {
+  focusFirstField(): void {
     const input = this.renderRoot?.querySelector('app-input');
     input?.renderRoot?.querySelector<HTMLElement>('input, select')?.focus();
   }
@@ -176,6 +176,6 @@ export class EmployeeAddForm extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'employee-add-form': EmployeeAddForm;
+    'employee-form': EmployeeForm;
   }
 }
