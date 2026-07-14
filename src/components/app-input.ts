@@ -5,6 +5,8 @@ export interface InputChangeDetail {
   value: string;
 }
 
+export type InputIcon = 'user' | 'department' | 'designation' | 'email';
+
 @customElement('app-input')
 export class AppInput extends LitElement {
   static override styles = css`
@@ -20,14 +22,40 @@ export class AppInput extends LitElement {
       color: #374151;
     }
 
+    .field {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .field img {
+      position: absolute;
+      left: 12px;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+
     input,
     select {
       font: inherit;
-      padding: 9px 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 12px;
+      border: 1px solid #e2e6ee;
+      border-radius: 10px;
       background: #fff;
+      color: #1f2933;
       transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field.has-icon input,
+    .field.has-icon select {
+      padding-left: 40px;
+    }
+
+    input::placeholder {
+      color: #9aa5b8;
     }
 
     input:focus,
@@ -53,6 +81,7 @@ export class AppInput extends LitElement {
   @property() placeholder = '';
   @property() value = '';
   @property() error = '';
+  @property() icon: InputIcon | '' = '';
 
   /** When provided, renders a <select> with these options instead of an <input>. */
   @property({attribute: false}) options: string[] | null = null;
@@ -68,10 +97,20 @@ export class AppInput extends LitElement {
     );
   }
 
+  private get accessibleName(): string {
+    return this.label || this.placeholder;
+  }
+
   override render() {
+    const iconTemplate = this.icon
+      ? html`<img src="/assets/icons/${this.icon}.svg" alt="" />`
+      : nothing;
     return html`
       ${this.label ? html`<label for="control">${this.label}</label>` : nothing}
-      ${this.options ? this.renderSelect() : this.renderInput()}
+      <div class="field ${this.icon ? 'has-icon' : ''}">
+        ${iconTemplate}
+        ${this.options ? this.renderSelect() : this.renderInput()}
+      </div>
       ${this.error ? html`<span class="error">${this.error}</span>` : nothing}
     `;
   }
@@ -83,6 +122,7 @@ export class AppInput extends LitElement {
         type=${this.type}
         class=${this.error ? 'invalid' : ''}
         placeholder=${this.placeholder}
+        aria-label=${this.accessibleName}
         .value=${this.value}
         @input=${this.handleInput}
       />
@@ -94,6 +134,7 @@ export class AppInput extends LitElement {
       <select
         id="control"
         class=${this.error ? 'invalid' : ''}
+        aria-label=${this.accessibleName}
         .value=${this.value}
         @change=${this.handleInput}
       >

@@ -1,7 +1,12 @@
 import {LitElement, html, css, nothing} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'icon';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'icon-primary'
+  | 'icon-danger';
 export type ButtonType = 'button' | 'submit';
 
 @customElement('app-button')
@@ -14,6 +19,12 @@ export class AppButton extends LitElement {
     button {
       font: inherit;
       font-weight: 500;
+      width: 100%;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       cursor: pointer;
       border: 1px solid transparent;
       border-radius: 6px;
@@ -49,18 +60,33 @@ export class AppButton extends LitElement {
       background: #b91c1c;
     }
 
-    .icon {
+    .icon-primary,
+    .icon-danger {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: none;
-      border-radius: 4px;
-      padding: 4px;
+      border-radius: 8px;
+      padding: 7px;
       line-height: 0;
     }
 
-    .icon:hover {
-      background: #f1f5f9;
+    .icon-primary {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    .icon-primary:hover {
+      background: #dbeafe;
+    }
+
+    .icon-danger {
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .icon-danger:hover {
+      background: #fee2e2;
     }
 
     ::slotted(img) {
@@ -81,7 +107,7 @@ export class AppButton extends LitElement {
 
   override render() {
     const iconLabel =
-      this.variant === 'icon' && this.label ? this.label : nothing;
+      this.variant.startsWith('icon') && this.label ? this.label : nothing;
     return html`
       <button
         class=${this.variant}

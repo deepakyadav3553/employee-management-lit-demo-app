@@ -4,7 +4,7 @@ import './employee-add-form';
 import './employee-table';
 import './confirm-modal';
 import './app-toast';
-import type {EmployeeSaveDetail} from './employee-add-form';
+import type {EmployeeSaveDetail, EmployeeAddForm} from './employee-add-form';
 import type {AppToast} from './app-toast';
 import {Employee} from '../types';
 
@@ -26,18 +26,64 @@ export class AppRoot extends LitElement {
       color: #1f2933;
       max-width: 900px;
       margin: 0 auto;
-      padding: 24px;
     }
 
-    h1 {
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 28px 32px;
+      background: linear-gradient(115deg, #3b6fe0 0%, #4f46e5 100%);
+      color: #fff;
+    }
+
+    .header h1 {
       font-size: 26px;
-      margin: 0 0 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .header p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
     }
 
     .form-section {
-      padding-bottom: 24px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 28px 32px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .table-section {
+      padding: 20px 32px 28px;
+    }
+
+    @media (max-width: 640px) {
+      .header {
+        align-items: stretch;
+        padding: 22px 20px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .form-section {
+        padding: 20px;
+      }
+
+      .table-section {
+        padding: 16px 20px 22px;
+      }
     }
   `;
 
@@ -45,6 +91,7 @@ export class AppRoot extends LitElement {
   @state() private editing: Employee | null = null;
   @state() private pendingDelete: Employee | null = null;
   @query('app-toast') private toaster!: AppToast;
+  @query('employee-add-form') private addForm!: EmployeeAddForm;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -131,23 +178,36 @@ export class AppRoot extends LitElement {
     this.persist();
   }
 
+  private handleAddClick(): void {
+    this.editing = null;
+    this.addForm?.focusFirst();
+  }
+
   override render() {
     return html`
-      <h1>Employee Management</h1>
-      <div class="form-section">
-        <employee-add-form
-          .editing=${this.editing}
-          @employee-save=${this.handleSave}
-          @form-cancel=${this.handleCancel}
-        ></employee-add-form>
-      </div>
-      <div>
-        <employee-table
-          .employees=${this.employees}
-          @employee-edit=${this.handleEdit}
-          @employee-delete=${this.handleDelete}
-          @add-dummies=${this.addDummyRecords}
-        ></employee-table>
+      <div class="card">
+        <header class="header">
+          <div>
+            <h1>Employee Management</h1>
+            <p>Manage your organization employees</p>
+          </div>
+        </header>
+        <div class="form-section">
+          <employee-add-form
+            .editing=${this.editing}
+            @employee-save=${this.handleSave}
+            @form-cancel=${this.handleCancel}
+          ></employee-add-form>
+        </div>
+        <div class="table-section">
+          <employee-table
+            .employees=${this.employees}
+            @employee-edit=${this.handleEdit}
+            @employee-delete=${this.handleDelete}
+            @employee-add-request=${this.handleAddClick}
+            @add-dummies=${this.addDummyRecords}
+          ></employee-table>
+        </div>
       </div>
       <confirm-modal
         ?open=${this.pendingDelete !== null}

@@ -3,7 +3,7 @@ import {customElement, property, state} from 'lit/decorators.js';
 import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../types';
 import './app-button';
 import './app-input';
-import type {InputChangeDetail} from './app-input';
+import type {InputChangeDetail, InputIcon} from './app-input';
 
 export interface EmployeeSaveDetail {
   id: string | null;
@@ -25,19 +25,24 @@ export class EmployeeAddForm extends LitElement {
 
     .form-actions {
       display: flex;
+      justify-content: flex-end;
       gap: 10px;
       margin-top: 20px;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 820px) {
       .form-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    @media (max-width: 440px) {
+    @media (max-width: 560px) {
       .form-grid {
         grid-template-columns: 1fr;
+      }
+
+      .form-actions app-button {
+        flex: 1;
       }
     }
   `;
@@ -119,12 +124,12 @@ export class EmployeeAddForm extends LitElement {
     return html`
       <form @submit=${this.handleSubmit} novalidate>
         <div class="form-grid">
-          ${this.renderField('name', 'Name', 'Enter name')}
-          ${this.renderField('department', 'Department', 'Select department', {
+          ${this.renderField('name', 'Full Name', 'user')}
+          ${this.renderField('department', 'Department', 'department', {
             options: DEPARTMENTS,
           })}
-          ${this.renderField('designation', 'Designation', 'Enter designation')}
-          ${this.renderField('email', 'Email', 'Enter email', {type: 'email'})}
+          ${this.renderField('designation', 'Designation', 'designation')}
+          ${this.renderField('email', 'Email', 'email', {type: 'email'})}
         </div>
 
         <div class="form-actions">
@@ -143,17 +148,22 @@ export class EmployeeAddForm extends LitElement {
     `;
   }
 
+  focusFirst(): void {
+    const input = this.renderRoot?.querySelector('app-input');
+    input?.renderRoot?.querySelector<HTMLElement>('input, select')?.focus();
+  }
+
   private renderField(
     field: keyof EmployeeDraft,
-    label: string,
     placeholder: string,
+    icon: InputIcon,
     {type = 'text', options = null}: {type?: string; options?: string[] | null} = {}
   ) {
     return html`
       <app-input
-        label=${label}
         type=${type}
         placeholder=${placeholder}
+        icon=${icon}
         .options=${options}
         .value=${this.draft[field]}
         error=${this.errors[field] ?? ''}
