@@ -1,67 +1,73 @@
-import {Employee, EmployeeDraft} from '../models/employee';
+import { Employee, EmployeeDraft } from '../models/employee';
 
 const BASE_URL = 'http://localhost:8081';
+const EMPLOYEES = '/employees';
+const employeePath = (id: string): string => `${EMPLOYEES}/${id}`;
 
-function normalize(raw: unknown): Employee {
-  const record = raw as Record<string, unknown>;
+interface EmployeeApiRecord {
+  id: number;
+  name: string;
+  department: string;
+  designation: string;
+  email: string;
+}
+
+export class ApiError extends Error {
+  constructor(readonly status: number, action: string) {
+    super(`Failed to ${action} (${status})`);
+    this.name = 'ApiError';
+  }
+}
+
+function toEmployee(record: EmployeeApiRecord): Employee {
   return {
-    id: String(record.id ?? ''),
-    name: String(record.name ?? ''),
-    department: String(record.department ?? ''),
-    designation: String(record.designation ?? ''),
-    email: String(record.email ?? ''),
+    id: String(record.id),
+    name: record.name,
+    department: record.department,
+    designation: record.designation,
+    email: record.email
   };
 }
 
-/**
- * Fetches the saved employee records from the backend and normalizes them
- * to the shape used across the UI (string ids, no missing fields).
- */
+async function send(path: string, action: string, init?: RequestInit): Promise<Response> {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    headers: init?.body ? { 'Content-Type': 'application/json' } : undefined,
+    ...init
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, action);
+  }
+
+  return response;
+}
+
+async function requestJson<T>(path: string, action: string, init?: RequestInit): Promise<T> {
+  const response = await send(path, action, init);
+  return response.json() as Promise<T>;
+}
+
 export async function fetchEmployees(): Promise<Employee[]> {
-  const response = await fetch(`${BASE_URL}/employees`);
-  if (!response.ok) {
-    throw new Error(`Failed to load employees (${response.status})`);
-  }
-  const data = (await response.json()) as unknown;
-  if (!Array.isArray(data)) return [];
-  return data.map(normalize);
+  const data = await requestJson<EmployeeApiRecord[]>(EMPLOYEES, 'load employees');
+  return data.map(toEmployee);
 }
 
-/** Creates a new employee record and returns the saved entity. */
 export async function createEmployee(draft: EmployeeDraft): Promise<Employee> {
-  const response = await fetch(`${BASE_URL}/employees`, {
+  const data = await requestJson<EmployeeApiRecord>(EMPLOYEES, 'create employee', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(draft),
+    body: JSON.stringify(draft)
   });
-  if (!response.ok) {
-    throw new Error(`Failed to create employee (${response.status})`);
-  }
-  return normalize(await response.json());
+  return toEmployee(data);
 }
 
-/** Updates an existing employee record and returns the saved entity. */
-export async function updateEmployee(
-  id: string,
-  draft: EmployeeDraft
-): Promise<Employee> {
-  const response = await fetch(`${BASE_URL}/employees/${id}`, {
+export async function updateEmployee(id: string, draft: EmployeeDraft): Promise<Employee> {
+  const data = await requestJson<EmployeeApiRecord>(employeePath(id), 'update employee', {
     method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(draft),
+    body: JSON.stringify(draft)
   });
-  if (!response.ok) {
-    throw new Error(`Failed to update employee (${response.status})`);
-  }
-  return normalize(await response.json());
+  return toEmployee(data);
 }
 
-/** Deletes an employee record by id. */
 export async function deleteEmployee(id: string): Promise<void> {
-  const response = await fetch(`${BASE_URL}/employees/${id}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to delete employee (${response.status})`);
-  }
+  await send(employeePath(id), 'delete employee', { method: 'DELETE' });
 }
