@@ -105,15 +105,6 @@ describe('employee-table', () => {
     await oneEvent(el, 'employee-add-request');
   });
 
-  it('emits add-dummies from the empty-state link', async () => {
-    const el = await table([]);
-    const link = el.shadowRoot!.querySelector<HTMLButtonElement>(
-      '.dummy-link'
-    )!;
-    setTimeout(() => link.click());
-    await oneEvent(el, 'add-dummies');
-  });
-
   it('clamps the page when the employee list shrinks', async () => {
     const el = await table(makeEmployees(6));
     el.shadowRoot!

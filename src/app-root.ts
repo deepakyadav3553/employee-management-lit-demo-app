@@ -10,15 +10,12 @@ import type {
 } from './components/employee/employee-form';
 import type {AppToast} from './components/ui/app-toast';
 import {Employee} from './models/employee';
-
-const STORAGE_KEY = 'employee-management:employees';
-
-function generateId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-  return `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
+import {
+  fetchEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+} from './services/employee-api';
 
 @customElement('app-root')
 export class AppRoot extends LitElement {
@@ -98,43 +95,39 @@ export class AppRoot extends LitElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.employees = this.loadEmployees();
+    void this.loadFromApi();
   }
 
-  private loadEmployees(): Employee[] {
+  private async loadFromApi(): Promise<void> {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Employee[];
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {
-      return [];
-    }
-    return [];
-  }
-
-  private persistEmployees(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.employees));
-    } catch {
-      // localStorage may be unavailable; the app still works in-memory
+      this.employees = await fetchEmployees();
+    } catch (error) {
+      console.error('Failed to load employees from API', error);
+      this.toast?.show('Could not load employees from server.', 'error');
     }
   }
 
-  private handleSave(event: CustomEvent<EmployeeSaveDetail>): void {
+  private async handleSave(
+    event: CustomEvent<EmployeeSaveDetail>
+  ): Promise<void> {
     const {id, draft} = event.detail;
-    if (id) {
-      this.employees = this.employees.map((e) =>
-        e.id === id ? {id, ...draft} : e
-      );
-      this.toast.show('Employee updated successfully!', 'info');
-    } else {
-      this.employees = [...this.employees, {id: generateId(), ...draft}];
-      this.toast.show('Employee added successfully!', 'success');
+    try {
+      if (id) {
+        const saved = await updateEmployee(id, draft);
+        this.employees = this.employees.map((e) =>
+          e.id === id ? saved : e
+        );
+        this.toast.show('Employee updated successfully!', 'info');
+      } else {
+        const saved = await createEmployee(draft);
+        this.employees = [...this.employees, saved];
+        this.toast.show('Employee added successfully!', 'success');
+      }
+      this.editing = null;
+    } catch (error) {
+      console.error('Failed to save employee', error);
+      this.toast.show('Could not save employee to server.', 'error');
     }
-    this.persistEmployees();
-    this.editing = null;
   }
 
   private handleEdit(event: CustomEvent<Employee>): void {
@@ -145,14 +138,19 @@ export class AppRoot extends LitElement {
     this.pendingDelete = event.detail;
   }
 
-  private confirmDelete(): void {
+  private async confirmDelete(): Promise<void> {
     const employee = this.pendingDelete;
     if (!employee) return;
-    this.employees = this.employees.filter((e) => e.id !== employee.id);
-    this.persistEmployees();
-    if (this.editing?.id === employee.id) this.editing = null;
     this.pendingDelete = null;
-    this.toast.show('Employee deleted successfully!', 'error');
+    try {
+      await deleteEmployee(employee.id);
+      this.employees = this.employees.filter((e) => e.id !== employee.id);
+      if (this.editing?.id === employee.id) this.editing = null;
+      this.toast.show('Employee deleted successfully!', 'error');
+    } catch (error) {
+      console.error('Failed to delete employee', error);
+      this.toast.show('Could not delete employee on server.', 'error');
+    }
   }
 
   private cancelDelete(): void {
@@ -161,24 +159,6 @@ export class AppRoot extends LitElement {
 
   private handleFormCancel(): void {
     this.editing = null;
-  }
-
-  private addDummyRecords(): void {
-    const dummies: Employee[] = [
-      {name: 'Olivia Bennett', department: 'Engineering', designation: 'Developer'},
-      {name: 'Liam Carter', department: 'HR', designation: 'Manager'},
-      {name: 'Sophia Nguyen', department: 'Finance', designation: 'Analyst'},
-      {name: 'Noah Patel', department: 'Marketing', designation: 'Designer'},
-      {name: 'Ava Rodriguez', department: 'Sales', designation: 'Coordinator'},
-    ].map(({name, department, designation}) => ({
-      id: generateId(),
-      name,
-      department,
-      designation,
-      email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-    }));
-    this.employees = [...this.employees, ...dummies];
-    this.persistEmployees();
   }
 
   private handleAddRequest(): void {
@@ -208,7 +188,6 @@ export class AppRoot extends LitElement {
             @employee-edit=${this.handleEdit}
             @employee-delete=${this.handleDelete}
             @employee-add-request=${this.handleAddRequest}
-            @add-dummies=${this.addDummyRecords}
           ></employee-table>
         </div>
       </div>

@@ -107,20 +107,6 @@ export class EmployeeTable extends LitElement {
       color: #94a3b8;
     }
 
-    .dummy-link {
-      font: inherit;
-      font-size: 13px;
-      background: none;
-      border: none;
-      color: #2563eb;
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .dummy-link:hover {
-      text-decoration: underline;
-    }
-
     /* Tablet: let a wide table scroll horizontally rather than overflow */
     @media (max-width: 820px) {
       .table-scroll {
@@ -238,9 +224,6 @@ export class EmployeeTable extends LitElement {
             <img src="/assets/icons/plus-white.svg" alt="" />
             Add Employee
           </app-button>
-          <button class="dummy-link" @click=${() => this.emit('add-dummies')}>
-            or add 5 dummy records
-          </button>
         </empty-state>
       `;
     }
