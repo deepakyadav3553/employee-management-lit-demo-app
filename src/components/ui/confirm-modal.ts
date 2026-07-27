@@ -82,11 +82,15 @@ export class ConfirmModal extends LitElement {
   @property() cancelLabel = 'Cancel';
 
   private cancel(): void {
-    this.dispatchEvent(new CustomEvent('modal-cancel'));
+    this.dispatchEvent(
+      new CustomEvent('modal-cancel', {bubbles: true, composed: true})
+    );
   }
 
   private confirm(): void {
-    this.dispatchEvent(new CustomEvent('modal-confirm'));
+    this.dispatchEvent(
+      new CustomEvent('modal-confirm', {bubbles: true, composed: true})
+    );
   }
 
   private handleOverlayClick(event: MouseEvent): void {

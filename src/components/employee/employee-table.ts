@@ -1,12 +1,9 @@
-import {LitElement, html, css, PropertyValues} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import {Employee} from '../../models/employee';
 import '../ui/app-button';
 import '../ui/app-pagination';
 import '../ui/empty-state';
-import type {PageChangeDetail} from '../ui/app-pagination';
-
-const PAGE_SIZE = 5;
 
 const AVATAR_COLORS = [
   '#dbeafe',
@@ -190,16 +187,12 @@ export class EmployeeTable extends LitElement {
     }
   `;
 
-  @property({attribute: false}) employees: Employee[] = [];
-
-  @state() private page = 1;
-
-  override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has('employees')) {
-      const maxPage = Math.max(1, Math.ceil(this.employees.length / PAGE_SIZE));
-      if (this.page > maxPage) this.page = maxPage;
-    }
-  }
+  @property({attribute: false}) pageItems: Employee[] = [];
+  @property({type: Number}) total = 0;
+  @property({type: Number}) page = 1;
+  @property({type: Number}) totalPages = 1;
+  @property({type: Number}) rangeStart = 0;
+  @property({type: Number}) rangeEnd = 0;
 
   private emit(type: string, detail?: unknown): void {
     this.dispatchEvent(
@@ -223,8 +216,7 @@ export class EmployeeTable extends LitElement {
   }
 
   override render() {
-    const total = this.employees.length;
-    if (total === 0) {
+    if (this.total === 0) {
       return html`
         <empty-state
           image="/assets/icons/empty-folder.svg"
@@ -245,11 +237,6 @@ export class EmployeeTable extends LitElement {
       `;
     }
 
-    const totalPages = Math.ceil(total / PAGE_SIZE);
-    const page = Math.min(this.page, totalPages);
-    const start = (page - 1) * PAGE_SIZE;
-    const pageItems = this.employees.slice(start, start + PAGE_SIZE);
-
     return html`
       <div class="table-scroll">
         <table>
@@ -263,7 +250,7 @@ export class EmployeeTable extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${pageItems.map(
+            ${this.pageItems.map(
               (employee) => html`
               <tr>
                 <td class="name-td">
@@ -307,20 +294,15 @@ export class EmployeeTable extends LitElement {
 
       <div class="footer">
         <span class="summary">
-          Showing ${start + 1} to ${start + pageItems.length} of ${total}
+          Showing ${this.rangeStart} to ${this.rangeEnd} of ${this.total}
           employees
         </span>
         <app-pagination
-          .page=${page}
-          .totalPages=${totalPages}
-          @page-change=${this.handlePageChange}
+          .page=${this.page}
+          .totalPages=${this.totalPages}
         ></app-pagination>
       </div>
     `;
-  }
-
-  private handlePageChange(event: CustomEvent<PageChangeDetail>): void {
-    this.page = event.detail.page;
   }
 }
 

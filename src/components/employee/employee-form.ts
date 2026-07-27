@@ -1,13 +1,18 @@
-import {LitElement, html, css, PropertyValues} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
-import {Employee, EmployeeDraft, emptyDraft, DEPARTMENTS} from '../../models/employee';
+import {LitElement, html, css} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
+import {
+  EmployeeDraft,
+  EmployeeDraftErrors,
+  emptyDraft,
+  DEPARTMENTS,
+} from '../../models/employee';
 import '../ui/app-button';
 import '../ui/app-input';
 import type {InputChangeDetail, InputIcon} from '../ui/app-input';
 
-export interface EmployeeSaveDetail {
-  id: string | null;
-  draft: EmployeeDraft;
+export interface FieldChangeDetail {
+  field: keyof EmployeeDraft;
+  value: string;
 }
 
 @customElement('employee-form')
@@ -47,85 +52,43 @@ export class EmployeeForm extends LitElement {
     }
   `;
 
-  @property({attribute: false}) editing: Employee | null = null;
+  @property({attribute: false}) draft: EmployeeDraft = emptyDraft();
+  @property({attribute: false}) errors: EmployeeDraftErrors = {};
+  @property({attribute: false}) isEditing = false;
+  @property({attribute: false}) disableSubmit = false;
 
-  @state() private draft: EmployeeDraft = emptyDraft();
-  @state() private errors: Partial<Record<keyof EmployeeDraft, string>> = {};
-
-  override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has('editing')) {
-      const {id: _id, ...rest} = this.editing ?? {id: '', ...emptyDraft()};
-      this.draft = this.editing ? {...rest} : emptyDraft();
-      this.errors = {};
-    }
+  private emit(type: string, detail?: unknown): void {
+    this.dispatchEvent(
+      new CustomEvent(type, {detail, bubbles: true, composed: true})
+    );
   }
 
   private handleInput(
     field: keyof EmployeeDraft,
     event: CustomEvent<InputChangeDetail>
   ): void {
-    this.draft = {...this.draft, [field]: event.detail.value};
-    if (this.errors[field]) {
-      const {[field]: _removed, ...rest} = this.errors;
-      this.errors = rest;
-    }
-  }
-
-  private validate(draft: EmployeeDraft): typeof this.errors {
-    const errors: typeof this.errors = {};
-    if (!draft.name.trim()) errors.name = 'Name is required.';
-    if (!draft.department.trim()) errors.department = 'Department is required.';
-    if (!draft.designation.trim())
-      errors.designation = 'Designation is required.';
-    if (!draft.email.trim()) {
-      errors.email = 'Email is required.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.email.trim())) {
-      errors.email = 'Enter a valid email.';
-    }
-    return errors;
+    this.emit('field-change', {
+      field,
+      value: event.detail.value,
+    } as FieldChangeDetail);
   }
 
   private handleSubmit(event: Event): void {
     event.preventDefault();
-    const trimmed: EmployeeDraft = {
-      name: this.draft.name.trim(),
-      department: this.draft.department.trim(),
-      designation: this.draft.designation.trim(),
-      email: this.draft.email.trim(),
-    };
-    const errors = this.validate(trimmed);
-    if (Object.keys(errors).length > 0) {
-      this.errors = errors;
-      return;
-    }
-
-    this.dispatchEvent(
-      new CustomEvent<EmployeeSaveDetail>('employee-save', {
-        detail: {id: this.editing?.id ?? null, draft: trimmed},
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this.handleClear();
+    if (this.disableSubmit) return;
+    this.emit('form-submit');
   }
 
   private handleClear(): void {
-    this.draft = emptyDraft();
-    this.errors = {};
-    if (this.editing) {
-      this.dispatchEvent(
-        new CustomEvent('form-cancel', {bubbles: true, composed: true})
-      );
-    }
+    this.emit('form-clear');
   }
 
   override render() {
-    const isEditing = this.editing !== null;
     return html`
       <form @submit=${this.handleSubmit} novalidate>
         <div class="form-grid">
           ${this.renderField('name', 'Full Name', 'user')}
-          ${this.renderField('department', 'Department', 'department', {
+          ${this.renderField('department', 'Select', 'department', {
             options: DEPARTMENTS,
           })}
           ${this.renderField('designation', 'Designation', 'designation')}
@@ -135,12 +98,13 @@ export class EmployeeForm extends LitElement {
         <div class="form-actions">
           <app-button
             variant="primary"
-            type="submit"
-            label=${isEditing ? 'Update' : 'Save'}
+            label=${this.isEditing ? 'Update' : 'Save'}
+            .disabled=${this.disableSubmit}
+            @click=${this.handleSubmit}
           ></app-button>
           <app-button
             variant="secondary"
-            label=${isEditing ? 'Cancel' : 'Clear'}
+            label=${this.isEditing ? 'Cancel' : 'Clear'}
             @click=${this.handleClear}
           ></app-button>
         </div>

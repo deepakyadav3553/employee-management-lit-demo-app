@@ -7,7 +7,6 @@ export type ButtonVariant =
   | 'danger'
   | 'icon-primary'
   | 'icon-danger';
-export type ButtonType = 'button' | 'submit';
 
 @customElement('app-button')
 export class AppButton extends LitElement {
@@ -32,12 +31,17 @@ export class AppButton extends LitElement {
       transition: background 0.15s;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .primary {
       background: #2563eb;
       color: #fff;
     }
 
-    .primary:hover {
+    .primary:hover:not(:disabled) {
       background: #1d4ed8;
     }
 
@@ -47,7 +51,7 @@ export class AppButton extends LitElement {
       color: #334155;
     }
 
-    .secondary:hover {
+    .secondary:hover:not(:disabled) {
       background: #e2e8f0;
     }
 
@@ -56,7 +60,7 @@ export class AppButton extends LitElement {
       color: #fff;
     }
 
-    .danger:hover {
+    .danger:hover:not(:disabled) {
       background: #b91c1c;
     }
 
@@ -76,7 +80,7 @@ export class AppButton extends LitElement {
       background: #eff6ff;
     }
 
-    .icon-primary:hover {
+    .icon-primary:hover:not(:disabled) {
       background: #dbeafe;
     }
 
@@ -85,7 +89,7 @@ export class AppButton extends LitElement {
       background: #fef2f2;
     }
 
-    .icon-danger:hover {
+    .icon-danger:hover:not(:disabled) {
       background: #fee2e2;
     }
 
@@ -97,23 +101,19 @@ export class AppButton extends LitElement {
   `;
 
   @property() variant: ButtonVariant = 'primary';
-  @property() type: ButtonType = 'button';
   @property() label = '';
-
-  private handleClick(): void {
-    if (this.type !== 'submit') return;
-    this.closest('form')?.requestSubmit();
-  }
+  @property({type: Boolean, reflect: true}) disabled = false;
 
   override render() {
     const iconLabel =
       this.variant.startsWith('icon') && this.label ? this.label : nothing;
     return html`
       <button
+        type="button"
         class=${this.variant}
         title=${iconLabel}
         aria-label=${iconLabel}
-        @click=${this.handleClick}
+        ?disabled=${this.disabled}
       >
         <slot>${this.label}</slot>
       </button>

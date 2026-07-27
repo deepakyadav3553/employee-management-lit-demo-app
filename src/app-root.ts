@@ -1,24 +1,10 @@
 import {LitElement, html, css} from 'lit';
-import {customElement, state, query} from 'lit/decorators.js';
+import {customElement, property, query} from 'lit/decorators.js';
 import './components/employee/employee-form';
 import './components/employee/employee-table';
 import './components/ui/confirm-modal';
-import './components/ui/app-toast';
-import type {
-  EmployeeSaveDetail,
-  EmployeeForm,
-} from './components/employee/employee-form';
-import type {AppToast} from './components/ui/app-toast';
-import {Employee} from './models/employee';
-
-const STORAGE_KEY = 'employee-management:employees';
-
-function generateId(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-  return `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
+import type {EmployeeForm} from './components/employee/employee-form';
+import {Employee, EmployeeDraft, EmployeeDraftErrors, emptyDraft} from './models/employee';
 
 @customElement('app-root')
 export class AppRoot extends LitElement {
@@ -90,99 +76,24 @@ export class AppRoot extends LitElement {
     }
   `;
 
-  @state() private employees: Employee[] = [];
-  @state() private editing: Employee | null = null;
-  @state() private pendingDelete: Employee | null = null;
-  @query('app-toast') private toast!: AppToast;
+  @property({attribute: false}) draft: EmployeeDraft = emptyDraft();
+  @property({attribute: false}) errors: EmployeeDraftErrors = {};
+  @property({attribute: false}) isEditing = false;
+  @property({attribute: false}) disableSubmit = false;
+
+  @property({attribute: false}) pageItems: Employee[] = [];
+  @property({type: Number}) total = 0;
+  @property({type: Number}) page = 1;
+  @property({type: Number}) totalPages = 1;
+  @property({type: Number}) rangeStart = 0;
+  @property({type: Number}) rangeEnd = 0;
+
+  @property({type: Boolean}) confirmOpen = false;
+  @property() confirmHighlight = '';
+
   @query('employee-form') private employeeForm!: EmployeeForm;
 
-  override connectedCallback(): void {
-    super.connectedCallback();
-    this.employees = this.loadEmployees();
-  }
-
-  private loadEmployees(): Employee[] {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Employee[];
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {
-      return [];
-    }
-    return [];
-  }
-
-  private persistEmployees(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.employees));
-    } catch {
-      // localStorage may be unavailable; the app still works in-memory
-    }
-  }
-
-  private handleSave(event: CustomEvent<EmployeeSaveDetail>): void {
-    const {id, draft} = event.detail;
-    if (id) {
-      this.employees = this.employees.map((e) =>
-        e.id === id ? {id, ...draft} : e
-      );
-      this.toast.show('Employee updated successfully!', 'info');
-    } else {
-      this.employees = [...this.employees, {id: generateId(), ...draft}];
-      this.toast.show('Employee added successfully!', 'success');
-    }
-    this.persistEmployees();
-    this.editing = null;
-  }
-
-  private handleEdit(event: CustomEvent<Employee>): void {
-    this.editing = event.detail;
-  }
-
-  private handleDelete(event: CustomEvent<Employee>): void {
-    this.pendingDelete = event.detail;
-  }
-
-  private confirmDelete(): void {
-    const employee = this.pendingDelete;
-    if (!employee) return;
-    this.employees = this.employees.filter((e) => e.id !== employee.id);
-    this.persistEmployees();
-    if (this.editing?.id === employee.id) this.editing = null;
-    this.pendingDelete = null;
-    this.toast.show('Employee deleted successfully!', 'error');
-  }
-
-  private cancelDelete(): void {
-    this.pendingDelete = null;
-  }
-
-  private handleFormCancel(): void {
-    this.editing = null;
-  }
-
-  private addDummyRecords(): void {
-    const dummies: Employee[] = [
-      {name: 'Olivia Bennett', department: 'Engineering', designation: 'Developer'},
-      {name: 'Liam Carter', department: 'HR', designation: 'Manager'},
-      {name: 'Sophia Nguyen', department: 'Finance', designation: 'Analyst'},
-      {name: 'Noah Patel', department: 'Marketing', designation: 'Designer'},
-      {name: 'Ava Rodriguez', department: 'Sales', designation: 'Coordinator'},
-    ].map(({name, department, designation}) => ({
-      id: generateId(),
-      name,
-      department,
-      designation,
-      email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-    }));
-    this.employees = [...this.employees, ...dummies];
-    this.persistEmployees();
-  }
-
-  private handleAddRequest(): void {
-    this.editing = null;
+  focusFirstField(): void {
     this.employeeForm?.focusFirstField();
   }
 
@@ -197,32 +108,31 @@ export class AppRoot extends LitElement {
         </header>
         <div class="form-section">
           <employee-form
-            .editing=${this.editing}
-            @employee-save=${this.handleSave}
-            @form-cancel=${this.handleFormCancel}
+            .draft=${this.draft}
+            .errors=${this.errors}
+            .isEditing=${this.isEditing}
+            .disableSubmit=${this.disableSubmit}
           ></employee-form>
         </div>
         <div class="table-section">
           <employee-table
-            .employees=${this.employees}
-            @employee-edit=${this.handleEdit}
-            @employee-delete=${this.handleDelete}
-            @employee-add-request=${this.handleAddRequest}
-            @add-dummies=${this.addDummyRecords}
+            .pageItems=${this.pageItems}
+            .total=${this.total}
+            .page=${this.page}
+            .totalPages=${this.totalPages}
+            .rangeStart=${this.rangeStart}
+            .rangeEnd=${this.rangeEnd}
           ></employee-table>
         </div>
       </div>
       <confirm-modal
-        ?open=${this.pendingDelete !== null}
+        ?open=${this.confirmOpen}
         heading="Delete Employee"
         message="Are you sure you want to delete"
-        highlight=${this.pendingDelete ? `${this.pendingDelete.name}?` : ''}
+        highlight=${this.confirmHighlight}
         confirmLabel="Delete"
         cancelLabel="Cancel"
-        @modal-confirm=${this.confirmDelete}
-        @modal-cancel=${this.cancelDelete}
       ></confirm-modal>
-      <app-toast></app-toast>
     `;
   }
 }
