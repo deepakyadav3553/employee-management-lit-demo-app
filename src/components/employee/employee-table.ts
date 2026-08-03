@@ -118,7 +118,6 @@ export class EmployeeTable extends LitElement {
       text-decoration: underline;
     }
 
-    /* Tablet: let a wide table scroll horizontally rather than overflow */
     @media (max-width: 820px) {
       .table-scroll {
         overflow-x: auto;
@@ -130,7 +129,6 @@ export class EmployeeTable extends LitElement {
       }
     }
 
-    /* Mobile: collapse each row into a stacked card */
     @media (max-width: 560px) {
       .table-scroll {
         overflow-x: visible;
@@ -190,9 +188,20 @@ export class EmployeeTable extends LitElement {
   @property({attribute: false}) pageItems: Employee[] = [];
   @property({type: Number}) total = 0;
   @property({type: Number}) page = 1;
-  @property({type: Number}) totalPages = 1;
-  @property({type: Number}) rangeStart = 0;
-  @property({type: Number}) rangeEnd = 0;
+  @property({type: Number}) pageSize = 5;
+  @property({type: Boolean}) filtered = false;
+
+  private get totalPages(): number {
+    return Math.max(1, Math.ceil(this.total / this.pageSize));
+  }
+
+  private get rangeStart(): number {
+    return this.pageItems.length === 0 ? 0 : (this.page - 1) * this.pageSize + 1;
+  }
+
+  private get rangeEnd(): number {
+    return this.rangeStart === 0 ? 0 : this.rangeStart + this.pageItems.length - 1;
+  }
 
   private emit(type: string, detail?: unknown): void {
     this.dispatchEvent(
@@ -217,6 +226,16 @@ export class EmployeeTable extends LitElement {
 
   override render() {
     if (this.total === 0) {
+      if (this.filtered) {
+        return html`
+          <empty-state
+            image="/assets/icons/empty-folder.svg"
+            heading="No matching employees"
+            message="Try a different search term."
+          ></empty-state>
+        `;
+      }
+
       return html`
         <empty-state
           image="/assets/icons/empty-folder.svg"

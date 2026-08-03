@@ -83,7 +83,6 @@ export class AppInput extends LitElement {
   @property() error = '';
   @property() icon: InputIcon | '' = '';
 
-  /** When provided, renders a <select> with these options instead of an <input>. */
   @property({attribute: false}) options: string[] | null = null;
 
   private handleInput(event: Event): void {
