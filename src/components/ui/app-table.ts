@@ -49,9 +49,12 @@ export class AppTable extends LitElement {
       color: var(--color-text);
     }
 
+    /* Fills the host; scrolls when the host has a constrained height, otherwise
+       grows with its content. */
     .wrap {
       width: 100%;
-      overflow-x: auto;
+      height: 100%;
+      overflow: auto;
     }
 
     table {
@@ -68,6 +71,9 @@ export class AppTable extends LitElement {
     }
 
     thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;

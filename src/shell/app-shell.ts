@@ -91,8 +91,10 @@ export class AppShell extends LitElement {
       align-items: stretch;
     }
 
+    /* Fixed-height cards on the dashboard; each widget scrolls internally. */
     .widgets > * {
       min-width: 0;
+      height: 460px;
     }
 
     /* Backdrop behind the mobile drawer. */

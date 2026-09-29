@@ -16,7 +16,8 @@ import {
   getEmployees,
   createEmployee,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
+  addDummyEmployees
 } from '../services/employee-store';
 
 /** An empty draft used to reset the form. */
@@ -165,6 +166,37 @@ export class EmployeesWidget extends LitElement {
         padding-top: 4px;
         border-top: 1px solid var(--color-border-subtle);
       }
+
+      /* Toolbar above the table holds the "Add employee" action. */
+      .toolbar {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      /* Scroll region for the table; min-height:0 lets it shrink inside the
+         fixed-height card so the table (not the card) scrolls. */
+      .table-scroll {
+        flex: 1;
+        min-height: 0;
+      }
+
+      .table-scroll app-table {
+        display: block;
+        height: 100%;
+      }
+
+      /* Empty state with a shortcut to populate dummy data. */
+      .empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        color: var(--color-text-subtle);
+        font-size: 14px;
+        text-align: center;
+      }
     `
   ];
 
@@ -175,6 +207,8 @@ export class EmployeesWidget extends LitElement {
   @state() private employees: Employee[] = [];
   /** Id of the record being edited, or null when adding a new one. */
   @state() private editingId: string | null = null;
+  /** Whether the add/edit form is expanded. */
+  @state() private showForm = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -258,6 +292,7 @@ export class EmployeesWidget extends LitElement {
     const { id, ...input } = employee;
     this.editingId = id;
     this.draft = { ...input };
+    this.showForm = true;
   }
 
   private handleDelete(id: string): void {
@@ -270,9 +305,26 @@ export class EmployeesWidget extends LitElement {
     this.resetForm();
   }
 
+  /** Toggle the add form open/closed (always as a fresh, empty draft). */
+  private toggleForm(): void {
+    if (this.showForm) {
+      this.resetForm();
+    } else {
+      this.draft = { ...EMPTY_DRAFT };
+      this.editingId = null;
+      this.showForm = true;
+    }
+  }
+
+  private handleAddDummy(): void {
+    addDummyEmployees(20);
+    this.refresh();
+  }
+
   private resetForm(): void {
     this.draft = { ...EMPTY_DRAFT };
     this.editingId = null;
+    this.showForm = false;
   }
 
   private handleViewAll(): void {
@@ -291,10 +343,37 @@ export class EmployeesWidget extends LitElement {
             : nothing}
         </div>
 
-        <div class="form" @input-change=${this.handleFieldChange}>
-          <h3 class="form-title">
-            ${this.editingId ? 'Edit Employee' : 'Employee Form'}
-          </h3>
+        <div class="toolbar">
+          <app-button variant="primary" @click=${this.toggleForm}>
+            ${this.showForm ? 'Close' : '+ Add Employee'}
+          </app-button>
+        </div>
+
+        ${this.showForm ? this.renderForm() : nothing}
+
+        ${this.employees.length === 0
+          ? html`<div class="empty">
+              <span>No employees yet</span>
+              <app-button variant="secondary" @click=${this.handleAddDummy}>
+                Add 20 dummy records
+              </app-button>
+            </div>`
+          : html`<div class="table-scroll">
+              <app-table
+                .columns=${this.columns}
+                .rows=${this.employees}
+              ></app-table>
+            </div>`}
+      </div>
+    `;
+  }
+
+  private renderForm() {
+    return html`
+      <div class="form" @input-change=${this.handleFieldChange}>
+        <h3 class="form-title">
+          ${this.editingId ? 'Edit Employee' : 'Employee Form'}
+        </h3>
           <div class="fields">
             <app-input
               name="name"
@@ -334,21 +413,14 @@ export class EmployeesWidget extends LitElement {
               @toggle-change=${this.handleStatusChange}
             ></app-toggle>
           </div>
-          <div class="form-actions">
-            <app-button variant="secondary" @click=${this.handleClear}>
-              ${this.editingId ? 'Cancel' : 'Clear'}
-            </app-button>
-            <app-button variant="primary" @click=${this.handleSave}>
-              ${this.editingId ? 'Update' : 'Save'}
-            </app-button>
-          </div>
+        <div class="form-actions">
+          <app-button variant="secondary" @click=${this.handleClear}>
+            ${this.editingId ? 'Cancel' : 'Clear'}
+          </app-button>
+          <app-button variant="primary" @click=${this.handleSave}>
+            ${this.editingId ? 'Update' : 'Save'}
+          </app-button>
         </div>
-
-        <app-table
-          .columns=${this.columns}
-          .rows=${this.employees}
-          empty-text="No employees yet"
-        ></app-table>
       </div>
     `;
   }

@@ -73,7 +73,8 @@ export function getEmployee(id: string): Employee | undefined {
 export function createEmployee(input: EmployeeInput): Employee {
   const employee: Employee = {...input, id: makeId()};
   const list = read();
-  list.push(employee);
+  // Newest first: prepend so it shows at the top of the table.
+  list.unshift(employee);
   write(list);
   return employee;
 }
@@ -95,4 +96,31 @@ export function updateEmployee(
 /** Delete an employee by id. */
 export function deleteEmployee(id: string): void {
   write(read().filter((e) => e.id !== id));
+}
+
+const DUMMY_FIRST = ['Alex', 'Sam', 'Jordan', 'Taylor', 'Casey', 'Riley', 'Morgan', 'Jamie', 'Drew', 'Cameron'];
+const DUMMY_LAST = ['Reed', 'Parker', 'Hayes', 'Bennett', 'Foster', 'Gray', 'Hughes', 'Price', 'Ross', 'Ward'];
+const DUMMY_DEPARTMENTS = ['engineering', 'hr', 'finance', 'marketing', 'sales'];
+const DUMMY_DESIGNATIONS = ['Developer', 'Manager', 'Analyst', 'Specialist', 'Coordinator', 'Lead'];
+
+/**
+ * Append `count` randomly generated dummy employees (default 20) and return the
+ * full updated list. Useful for quickly populating an empty table.
+ */
+export function addDummyEmployees(count = 20): Employee[] {
+  const list = read();
+  for (let i = 0; i < count; i++) {
+    const first = DUMMY_FIRST[i % DUMMY_FIRST.length];
+    const last = DUMMY_LAST[(i * 3) % DUMMY_LAST.length];
+    list.push({
+      id: makeId(),
+      name: `${first} ${last}`,
+      department: DUMMY_DEPARTMENTS[i % DUMMY_DEPARTMENTS.length],
+      designation: DUMMY_DESIGNATIONS[i % DUMMY_DESIGNATIONS.length],
+      email: `${first}.${last}${i}@example.com`.toLowerCase(),
+      status: i % 4 === 0 ? 'inactive' : 'active'
+    });
+  }
+  write(list);
+  return list;
 }
