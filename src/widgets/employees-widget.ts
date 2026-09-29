@@ -1,41 +1,61 @@
-import {LitElement, html, css, nothing} from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
-import {widgetCardStyles} from '../styles/widget-card.styles';
-import {buildHash} from '../router/routes';
+import { LitElement, html, css, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { widgetCardStyles } from '../styles/widget-card.styles';
+import { buildHash } from '../router/routes';
 import '../components/ui/app-button';
 import '../components/ui/app-input';
 import '../components/ui/app-select';
 import '../components/ui/app-toggle';
-import type {InputChangeDetail} from '../components/ui/app-input';
-import type {SelectOption} from '../components/ui/app-select';
-import type {ToggleChangeDetail} from '../components/ui/app-toggle';
-
-/** A single employee record. */
-interface Employee {
-  name: string;
-  department: string;
-  designation: string;
-  email: string;
-  status: 'active' | 'inactive';
-}
+import '../components/ui/app-table';
+import type { InputChangeDetail } from '../components/ui/app-input';
+import type { SelectOption } from '../components/ui/app-select';
+import type { ToggleChangeDetail } from '../components/ui/app-toggle';
+import type { TableColumn } from '../components/ui/app-table';
+import type { Employee, EmployeeInput } from '../types/employee.types';
+import {
+  getEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee
+} from '../services/employee-store';
 
 /** An empty draft used to reset the form. */
-const EMPTY_DRAFT: Employee = {
+const EMPTY_DRAFT: EmployeeInput = {
   name: '',
   department: '',
   designation: '',
   email: '',
-  status: 'active',
+  status: 'active'
 };
 
 /** Departments available in the dropdown. */
 const DEPARTMENTS: SelectOption[] = [
-  {value: 'engineering', label: 'Engineering'},
-  {value: 'hr', label: 'HR'},
-  {value: 'finance', label: 'Finance'},
-  {value: 'marketing', label: 'Marketing'},
-  {value: 'sales', label: 'Sales'},
+  { value: 'engineering', label: 'Engineering' },
+  { value: 'hr', label: 'HR' },
+  { value: 'finance', label: 'Finance' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'sales', label: 'Sales' }
 ];
+
+/** Map a department value back to its display label. */
+function departmentLabel(value: string): string {
+  return DEPARTMENTS.find(d => d.value === value)?.label ?? value;
+}
+
+/** Small inline-styled badge for the status cell (table is style-isolated). */
+function statusBadge(status: Employee['status']) {
+  const active = status === 'active';
+  const style = `
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    color:${active ? '#166534' : '#991b1b'};
+    background:${active ? '#dcfce7' : '#fee2e2'};
+  `;
+  return html`<span style=${style}>${active ? 'Active' : 'Inactive'}</span>`;
+}
 
 /**
  * Employees widget — owns the "Employees" section of the dashboard.
@@ -145,40 +165,114 @@ export class EmployeesWidget extends LitElement {
         padding-top: 4px;
         border-top: 1px solid var(--color-border-subtle);
       }
-    `,
+    `
   ];
 
   /** Show the "View all" link (only on the dashboard home view). */
-  @property({type: Boolean, attribute: 'view-all'}) viewAll = false;
+  @property({ type: Boolean, attribute: 'view-all' }) viewAll = false;
 
-  @state() private draft: Employee = {...EMPTY_DRAFT};
+  @state() private draft: EmployeeInput = { ...EMPTY_DRAFT };
+  @state() private employees: Employee[] = [];
+  /** Id of the record being edited, or null when adding a new one. */
+  @state() private editingId: string | null = null;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.refresh();
+  }
+
+  /** Reload the list from the localStorage-backed store. */
+  private refresh(): void {
+    this.employees = getEmployees();
+  }
+
+  /** Table columns, including an actions column wired to this instance. */
+  private get columns(): TableColumn[] {
+    return [
+      { key: 'name', label: 'Name' },
+      {
+        key: 'department',
+        label: 'Department',
+        render: row => departmentLabel((row as unknown as Employee).department)
+      },
+      { key: 'designation', label: 'Designation' },
+      { key: 'email', label: 'Email' },
+      {
+        key: 'status',
+        label: 'Status',
+        align: 'center',
+        render: row => statusBadge((row as unknown as Employee).status)
+      },
+      {
+        key: 'actions',
+        label: 'Actions',
+        align: 'right',
+        width: '120px',
+        render: row => this.renderActions(row as unknown as Employee)
+      }
+    ];
+  }
+
+  private renderActions(employee: Employee) {
+    const base =
+      'border:none;background:none;cursor:pointer;font:inherit;font-size:13px;font-weight:600;padding:4px 6px;';
+    return html`
+      <button
+        style=${base + 'color:var(--color-primary);'}
+        @click=${() => this.handleEdit(employee)}
+      >
+        Edit
+      </button>
+      <button
+        style=${base + 'color:var(--color-danger);'}
+        @click=${() => this.handleDelete(employee.id)}
+      >
+        Delete
+      </button>
+    `;
+  }
 
   private handleFieldChange(event: CustomEvent<InputChangeDetail>): void {
-    const {name, value} = event.detail;
-    this.draft = {...this.draft, [name as keyof Employee]: value};
+    const { name, value } = event.detail;
+    this.draft = { ...this.draft, [name as keyof EmployeeInput]: value };
   }
 
   private handleStatusChange(event: CustomEvent<ToggleChangeDetail>): void {
     this.draft = {
       ...this.draft,
-      status: event.detail.checked ? 'active' : 'inactive',
+      status: event.detail.checked ? 'active' : 'inactive'
     };
   }
 
   private handleSave(): void {
-    // Keep it simple: emit the new employee for a parent/store to handle.
-    this.dispatchEvent(
-      new CustomEvent<Employee>('employee-add', {
-        detail: {...this.draft},
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this.draft = {...EMPTY_DRAFT};
+    if (this.editingId) {
+      updateEmployee(this.editingId, this.draft);
+    } else {
+      createEmployee(this.draft);
+    }
+    this.resetForm();
+    this.refresh();
+  }
+
+  private handleEdit(employee: Employee): void {
+    const { id, ...input } = employee;
+    this.editingId = id;
+    this.draft = { ...input };
+  }
+
+  private handleDelete(id: string): void {
+    deleteEmployee(id);
+    if (this.editingId === id) this.resetForm();
+    this.refresh();
   }
 
   private handleClear(): void {
-    this.draft = {...EMPTY_DRAFT};
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.draft = { ...EMPTY_DRAFT };
+    this.editingId = null;
   }
 
   private handleViewAll(): void {
@@ -191,18 +285,16 @@ export class EmployeesWidget extends LitElement {
         <div class="header">
           <h2 class="title">Employees</h2>
           ${this.viewAll
-            ? html`<button
-                type="button"
-                class="view-all"
-                @click=${this.handleViewAll}
-              >
+            ? html`<button type="button" class="view-all" @click=${this.handleViewAll}>
                 View all →
               </button>`
             : nothing}
         </div>
 
         <div class="form" @input-change=${this.handleFieldChange}>
-          <h3 class="form-title">Employee Form</h3>
+          <h3 class="form-title">
+            ${this.editingId ? 'Edit Employee' : 'Employee Form'}
+          </h3>
           <div class="fields">
             <app-input
               name="name"
@@ -244,13 +336,19 @@ export class EmployeesWidget extends LitElement {
           </div>
           <div class="form-actions">
             <app-button variant="secondary" @click=${this.handleClear}>
-              Clear
+              ${this.editingId ? 'Cancel' : 'Clear'}
             </app-button>
             <app-button variant="primary" @click=${this.handleSave}>
-              Save
+              ${this.editingId ? 'Update' : 'Save'}
             </app-button>
           </div>
         </div>
+
+        <app-table
+          .columns=${this.columns}
+          .rows=${this.employees}
+          empty-text="No employees yet"
+        ></app-table>
       </div>
     `;
   }
