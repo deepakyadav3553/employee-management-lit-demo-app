@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import type {NavItem, NavSelectDetail} from '../../models/nav';
+import type {NavItem, NavSelectDetail} from '../../types/navigation.types';
 
 /**
  * Left sidebar navigation. Stateless — active item comes in via `active`,
@@ -12,10 +12,10 @@ export class AppSidebar extends LitElement {
     :host {
       display: block;
       height: 100%;
-      background: #fff;
-      border-right: 1px solid #e6eaf1;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border-subtle);
+      font-family: var(--font-sans);
+      color: var(--color-text);
     }
 
     nav {
@@ -30,9 +30,9 @@ export class AppSidebar extends LitElement {
       width: 100%;
       padding: 10px 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: transparent;
-      color: #64748b;
+      color: var(--color-text-muted);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -41,13 +41,13 @@ export class AppSidebar extends LitElement {
     }
 
     .nav-btn:hover {
-      background: #f1f5f9;
-      color: #1f2933;
+      background: var(--color-surface-hover);
+      color: var(--color-text);
     }
 
     .nav-btn.active {
-      background: #eef2ff;
-      color: #4f46e5;
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
     }
 
     /* Mobile: behave as an off-canvas drawer slid in from the left. */
@@ -62,7 +62,7 @@ export class AppSidebar extends LitElement {
         z-index: 50;
         transform: translateX(-100%);
         transition: transform 0.25s ease;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+        box-shadow: var(--shadow-drawer);
       }
 
       :host([open]) {

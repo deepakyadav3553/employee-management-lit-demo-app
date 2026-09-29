@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>HR Portal — Employee Management</title>
+    <!-- Global CSS variables: the single place to control the app's theme. -->
+    <link rel="stylesheet" href="./src/styles/variables.css" />
     <style>
       html,
       body {
@@ -11,12 +13,12 @@
         min-height: 100%;
       }
       body {
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        background: #eef1f6;
-        color: #1f2933;
+        font-family: var(--font-sans);
+        background: var(--color-bg);
+        color: var(--color-text);
       }
-    </style> 
-    <script type="module" src="./dist/shell/app-shell.js"></script>
+    </style>
+    <script type="module" src="./dist/main.js"></script>
   </head>
   <body>
     <app-shell></app-shell>

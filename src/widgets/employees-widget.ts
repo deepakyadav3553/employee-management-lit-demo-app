@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
+import {widgetCardStyles} from '../styles/widget-card.styles';
 import '../components/ui/app-button';
 import '../components/ui/app-search';
 import type {SearchChangeDetail} from '../components/ui/app-search';
@@ -11,28 +12,23 @@ import type {SearchChangeDetail} from '../components/ui/app-search';
  */
 @customElement('employees-widget')
 export class EmployeesWidget extends LitElement {
-  static override styles = css`
-    :host {
-      display: block;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
-      height: 100%;
-    }
+  static override styles = [
+    widgetCardStyles,
+    css`
+      :host {
+        display: block;
+        font-family: var(--font-sans);
+        color: var(--color-text);
+        height: 100%;
+      }
 
-    .card {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 260px;
-      height: 100%;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      padding: 24px;
-      box-sizing: border-box;
-    }
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
 
-    .header {
+      .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -45,15 +41,16 @@ export class EmployeesWidget extends LitElement {
       font-weight: 700;
     }
 
-    .body {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #94a3b8;
-      font-size: 14px;
-    }
-  `;
+      .body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-subtle);
+        font-size: 14px;
+      }
+    `,
+  ];
 
   @state() private query = '';
 

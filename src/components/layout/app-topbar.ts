@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import type {NavItem, NavSelectDetail} from '../../models/nav';
+import type {NavItem, NavSelectDetail} from '../../types/navigation.types';
 
 /**
  * Fired when the mobile menu button is pressed. The shell toggles the
@@ -18,8 +18,8 @@ export class AppTopbar extends LitElement {
   static override styles = css`
     :host {
       display: block;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
+      font-family: var(--font-sans);
+      color: var(--color-text);
     }
 
     .topbar {
@@ -27,17 +27,17 @@ export class AppTopbar extends LitElement {
       align-items: center;
       gap: clamp(12px, 2vw, 24px);
       padding: 12px clamp(16px, 3vw, 24px);
-      background: #fff;
-      border-bottom: 1px solid #e6eaf1;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .menu-btn {
       display: none;
       padding: 8px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #1f2933;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-muted);
+      color: var(--color-text);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -45,7 +45,7 @@ export class AppTopbar extends LitElement {
     }
 
     .menu-btn:hover {
-      background: #f1f5f9;
+      background: var(--color-surface-hover);
     }
 
     .brand {
@@ -61,9 +61,9 @@ export class AppTopbar extends LitElement {
       justify-content: center;
       width: 36px;
       height: 36px;
-      border-radius: 10px;
-      background: linear-gradient(115deg, #3b6fe0 0%, #4f46e5 100%);
-      color: #f8fafc;
+      border-radius: var(--radius-md);
+      background: var(--brand-gradient);
+      color: var(--color-primary-contrast);
       font-size: 15px;
       font-weight: 700;
     }
@@ -85,9 +85,9 @@ export class AppTopbar extends LitElement {
       gap: 8px;
       padding: 8px 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       background: transparent;
-      color: #64748b;
+      color: var(--color-text-muted);
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -95,13 +95,13 @@ export class AppTopbar extends LitElement {
     }
 
     .nav-btn:hover {
-      background: #f1f5f9;
-      color: #1f2933;
+      background: var(--color-surface-hover);
+      color: var(--color-text);
     }
 
     .nav-btn.active {
-      background: #eef2ff;
-      color: #4f46e5;
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
     }
 
     .actions {
@@ -117,9 +117,9 @@ export class AppTopbar extends LitElement {
       gap: 8px;
       width: clamp(160px, 22vw, 280px);
       padding: 8px 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-muted);
     }
 
     .search input {
@@ -128,7 +128,7 @@ export class AppTopbar extends LitElement {
       background: transparent;
       font: inherit;
       font-size: 14px;
-      color: #1f2933;
+      color: var(--color-text);
       outline: none;
     }
 
@@ -140,8 +140,8 @@ export class AppTopbar extends LitElement {
       width: 40px;
       height: 40px;
       border: none;
-      border-radius: 10px;
-      background: #f8fafc;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-muted);
       font-size: 18px;
       cursor: pointer;
     }
@@ -153,9 +153,9 @@ export class AppTopbar extends LitElement {
       min-width: 16px;
       height: 16px;
       padding: 0 4px;
-      border-radius: 8px;
-      background: #ef4444;
-      color: #fff;
+      border-radius: var(--radius-sm);
+      background: var(--color-danger);
+      color: var(--color-primary-contrast);
       font-size: 10px;
       font-weight: 700;
       line-height: 16px;
@@ -169,8 +169,8 @@ export class AppTopbar extends LitElement {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: linear-gradient(115deg, #3b6fe0 0%, #4f46e5 100%);
-      color: #fff;
+      background: var(--brand-gradient);
+      color: var(--color-primary-contrast);
       font-size: 14px;
       font-weight: 700;
     }

@@ -33,9 +33,9 @@ export class AppButton extends LitElement {
       width: 100%;
       padding: 10px 18px;
       border: 1px solid transparent;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       font: inherit;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: var(--font-sans);
       font-size: 14px;
       font-weight: 600;
       line-height: 1;
@@ -51,33 +51,33 @@ export class AppButton extends LitElement {
 
     /* primary */
     .primary {
-      background: #4f46e5;
-      color: #fff;
+      background: var(--color-primary);
+      color: var(--color-primary-contrast);
     }
 
     .primary:hover:not(:disabled) {
-      background: #4338ca;
+      background: var(--color-primary-hover);
     }
 
     /* secondary */
     .secondary {
-      background: #eef2ff;
-      color: #4f46e5;
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
     }
 
     .secondary:hover:not(:disabled) {
-      background: #e0e7ff;
+      background: var(--color-primary-soft-hover);
     }
 
     /* ghost */
     .ghost {
       background: transparent;
-      color: #64748b;
+      color: var(--color-text-muted);
     }
 
     .ghost:hover:not(:disabled) {
-      background: #f1f5f9;
-      color: #1f2933;
+      background: var(--color-surface-hover);
+      color: var(--color-text);
     }
   `;
 

@@ -8,10 +8,3 @@ export interface NavItem {
 export interface NavSelectDetail {
   id: string;
 }
-
-export const NAV_ITEMS: readonly NavItem[] = [
-  {id: 'home', label: 'Home'},
-  {id: 'employees', label: 'Employees'},
-  {id: 'departments', label: 'Departments'},
-  {id: 'reports', label: 'Reports'},
-];

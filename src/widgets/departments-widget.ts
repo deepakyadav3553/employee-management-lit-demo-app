@@ -1,5 +1,6 @@
 import {LitElement, html, css} from 'lit';
 import {customElement} from 'lit/decorators.js';
+import {widgetCardStyles} from '../styles/widget-card.styles';
 
 /**
  * Departments widget — placeholder card.
@@ -7,32 +8,28 @@ import {customElement} from 'lit/decorators.js';
  */
 @customElement('departments-widget')
 export class DepartmentsWidget extends LitElement {
-  static override styles = css`
-    :host {
-      display: block;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #1f2933;
-    }
+  static override styles = [
+    widgetCardStyles,
+    css`
+      :host {
+        display: block;
+        font-family: var(--font-sans);
+        color: var(--color-text);
+      }
 
-    .card {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 260px;
-      height: 100%;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      padding: 24px;
-      box-sizing: border-box;
-    }
+      .card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-    .title {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 700;
-    }
-  `;
+      .title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+      }
+    `,
+  ];
 
   override render() {
     return html`

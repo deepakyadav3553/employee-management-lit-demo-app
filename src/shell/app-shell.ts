@@ -5,7 +5,8 @@ import '../components/layout/app-sidebar';
 import '../widgets/employees-widget';
 import '../widgets/departments-widget';
 import '../widgets/reports-widget';
-import {NAV_ITEMS, NavSelectDetail} from '../models/nav';
+import {NAV_ITEMS} from '../config/navigation';
+import type {NavSelectDetail} from '../types/navigation.types';
 
 /**
  * App shell — pure composition + layout. Owns the single source of truth for
@@ -19,9 +20,9 @@ export class AppShell extends LitElement {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      color: #1f2933;
-      background: #eef1f6;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+      background: var(--color-bg);
     }
 
     .body {
@@ -59,18 +60,18 @@ export class AppShell extends LitElement {
     .greeting p {
       margin: 0;
       font-size: 14px;
-      color: #64748b;
+      color: var(--color-text-muted);
     }
 
     .date {
       display: inline-flex;
       align-items: center;
       padding: 8px 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
       font-size: 13px;
-      color: #64748b;
+      color: var(--color-text-muted);
       white-space: nowrap;
     }
 
@@ -91,7 +92,7 @@ export class AppShell extends LitElement {
       position: fixed;
       inset: 0;
       z-index: 40;
-      background: rgba(15, 23, 42, 0.4);
+      background: var(--color-overlay);
     }
 
     /* Tablet: Employees spans the top row, other two share the row below. */
