@@ -262,21 +262,25 @@ export class EmployeesWidget extends LitElement {
   }
 
   private renderActions(employee: Employee) {
-    const base =
-      'border:none;background:none;cursor:pointer;font:inherit;font-size:13px;font-weight:600;padding:4px 6px;';
     return html`
-      <button
-        style=${base + 'color:var(--color-primary);'}
-        @click=${() => this.handleEdit(employee)}
-      >
-        Edit
-      </button>
-      <button
-        style=${base + 'color:var(--color-danger);'}
-        @click=${() => this.handleDelete(employee.id)}
-      >
-        Delete
-      </button>
+      <span style="display:inline-flex;gap:8px;justify-content:flex-end;">
+        <app-button
+          variant="ghost"
+          icon="edit"
+          icon-only
+          label="Edit"
+          style="--app-button-color: var(--color-primary);"
+          @click=${() => this.handleEdit(employee)}
+        ></app-button>
+        <app-button
+          variant="ghost"
+          icon="trash"
+          icon-only
+          label="Delete"
+          style="--app-button-color: var(--color-danger);"
+          @click=${() => this.handleDelete(employee.id)}
+        ></app-button>
+      </span>
     `;
   }
 
@@ -364,8 +368,12 @@ export class EmployeesWidget extends LitElement {
         </div>
 
         <div class="toolbar">
-          <app-button variant="primary" @click=${this.toggleForm}>
-            ${this.showForm ? 'Close' : '+ Add Employee'}
+          <app-button
+            variant="primary"
+            icon=${this.showForm ? 'xmark' : 'plus'}
+            @click=${this.toggleForm}
+          >
+            ${this.showForm ? 'Close' : 'Add Employee'}
           </app-button>
         </div>
 

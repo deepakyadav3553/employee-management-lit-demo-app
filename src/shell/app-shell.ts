@@ -20,28 +20,58 @@ export class AppShell extends LitElement {
     :host {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      /* Lock the shell to the viewport so the top bar and sidebar stay put and
+         only the main content scrolls. */
+      height: 100vh;
       font-family: var(--font-sans);
       color: var(--color-text);
       background: var(--color-bg);
     }
 
+    /* Top bar stays visible at the top of the shell. */
+    app-topbar {
+      flex: none;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
     .body {
       flex: 1;
+      min-height: 0;
       display: grid;
       grid-template-columns: 200px minmax(0, 1fr);
     }
 
+    /* Only the main column scrolls; the sidebar beside it stays fixed. */
     .main {
       min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
       padding: clamp(16px, 3vw, 32px);
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Cap content width on ultra-wide screens so it stays readable. */
     .container {
+      width: 100%;
       max-width: 1600px;
       margin: 0 auto;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Single-section view fills the remaining height so its widget can size to
+       it (table scrolls internally, pagination stays pinned at the bottom). */
+    .section {
+      flex: 1;
+      min-height: 0;
+      /* Leave a little breathing room at the bottom instead of filling fully. */
+      margin-bottom: 48px;
     }
 
     .greeting {
@@ -188,12 +218,9 @@ export class AppShell extends LitElement {
     `;
   }
 
-  /** A single-widget view with a page heading. */
-  private renderSection(title: string, widget: unknown) {
-    return html`
-      <h1 class="page-title">${title}</h1>
-      <div class="section">${widget}</div>
-    `;
+  /** A single-widget view. */
+  private renderSection(_title: string, widget: unknown) {
+    return html` <div class="section">${widget}</div> `;
   }
 
   /** Pick the view for the current route. */
