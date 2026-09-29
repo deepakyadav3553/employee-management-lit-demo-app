@@ -106,13 +106,6 @@ export class AppShell extends LitElement {
       white-space: nowrap;
     }
 
-    /* Single-section view (Employees / Departments / Reports). */
-    .page-title {
-      margin: 0 0 24px;
-      font-size: clamp(20px, 2.5vw, 24px);
-      font-weight: 700;
-    }
-
     /* ---------- Widget grid (matches screenshot) ---------- */
     .widgets {
       display: grid;
