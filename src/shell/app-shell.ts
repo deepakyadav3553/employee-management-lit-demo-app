@@ -7,6 +7,7 @@ import '../widgets/departments-widget';
 import '../widgets/reports-widget';
 import {NAV_ITEMS} from '../config/navigation';
 import type {NavSelectDetail} from '../types/navigation.types';
+import {RouterController} from '../router/router-controller';
 
 /**
  * App shell — pure composition + layout. Owns the single source of truth for
@@ -75,6 +76,13 @@ export class AppShell extends LitElement {
       white-space: nowrap;
     }
 
+    /* Single-section view (Employees / Departments / Reports). */
+    .page-title {
+      margin: 0 0 24px;
+      font-size: clamp(20px, 2.5vw, 24px);
+      font-weight: 700;
+    }
+
     /* ---------- Widget grid (matches screenshot) ---------- */
     .widgets {
       display: grid;
@@ -138,11 +146,11 @@ export class AppShell extends LitElement {
     }
   `;
 
-  @state() private activeNav = 'home';
+  private readonly router = new RouterController(this);
   @state() private sidebarOpen = false;
 
   private handleNavSelect(event: CustomEvent<NavSelectDetail>): void {
-    this.activeNav = event.detail.id;
+    this.router.go(event.detail.id);
     this.sidebarOpen = false;
   }
 
@@ -162,11 +170,62 @@ export class AppShell extends LitElement {
     });
   }
 
+  /** The dashboard home view: greeting plus all three widgets. */
+  private renderHome() {
+    return html`
+      <div class="greeting">
+        <div>
+          <h1>Good morning, John</h1>
+          <p>Here's what's happening with your team today.</p>
+        </div>
+        <span class="date">${this.today}</span>
+      </div>
+
+      <section class="widgets">
+        <employees-widget></employees-widget>
+        <departments-widget></departments-widget>
+        <reports-widget></reports-widget>
+      </section>
+    `;
+  }
+
+  /** A single-widget view with a page heading. */
+  private renderSection(title: string, widget: unknown) {
+    return html`
+      <h1 class="page-title">${title}</h1>
+      <div class="section">${widget}</div>
+    `;
+  }
+
+  /** Pick the view for the current route. */
+  private renderView() {
+    switch (this.router.current) {
+      case 'employees':
+        return this.renderSection(
+          'Employees',
+          html`<employees-widget></employees-widget>`
+        );
+      case 'departments':
+        return this.renderSection(
+          'Departments',
+          html`<departments-widget></departments-widget>`
+        );
+      case 'reports':
+        return this.renderSection(
+          'Reports',
+          html`<reports-widget></reports-widget>`
+        );
+      case 'home':
+      default:
+        return this.renderHome();
+    }
+  }
+
   override render() {
     return html`
       <app-topbar
         .items=${NAV_ITEMS}
-        .active=${this.activeNav}
+        .active=${this.router.current}
         @nav-select=${this.handleNavSelect}
         @menu-toggle=${this.handleMenuToggle}
       ></app-topbar>
@@ -174,7 +233,7 @@ export class AppShell extends LitElement {
       <div class="body">
         <app-sidebar
           .items=${NAV_ITEMS}
-          .active=${this.activeNav}
+          .active=${this.router.current}
           ?open=${this.sidebarOpen}
           @nav-select=${this.handleNavSelect}
         ></app-sidebar>
@@ -184,21 +243,7 @@ export class AppShell extends LitElement {
           : nothing}
 
         <main class="main">
-          <div class="container">
-            <div class="greeting">
-              <div>
-                <h1>Good morning, John</h1>
-                <p>Here's what's happening with your team today.</p>
-              </div>
-              <span class="date">${this.today}</span>
-            </div>
-
-            <section class="widgets">
-              <employees-widget></employees-widget>
-              <departments-widget></departments-widget>
-              <reports-widget></reports-widget>
-            </section>
-          </div>
+          <div class="container">${this.renderView()}</div>
         </main>
       </div>
     `;
