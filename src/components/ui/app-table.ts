@@ -88,6 +88,11 @@ export class AppTable extends LitElement {
       border-bottom: 1px solid var(--color-border-subtle);
     }
 
+    /* Zebra striping: shade alternate rows. */
+    tbody tr:nth-child(even) td {
+      background: var(--color-surface-muted);
+    }
+
     tbody tr:last-child td {
       border-bottom: none;
     }

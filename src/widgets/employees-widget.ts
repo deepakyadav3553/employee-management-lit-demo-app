@@ -7,10 +7,12 @@ import '../components/ui/app-input';
 import '../components/ui/app-select';
 import '../components/ui/app-toggle';
 import '../components/ui/app-table';
+import '../components/ui/app-pagination';
 import type { InputChangeDetail } from '../components/ui/app-input';
 import type { SelectOption } from '../components/ui/app-select';
 import type { ToggleChangeDetail } from '../components/ui/app-toggle';
 import type { TableColumn } from '../components/ui/app-table';
+import type { PageChangeDetail } from '../components/ui/app-pagination';
 import type { Employee, EmployeeInput } from '../types/employee.types';
 import {
   getEmployees,
@@ -209,15 +211,27 @@ export class EmployeesWidget extends LitElement {
   @state() private editingId: string | null = null;
   /** Whether the add/edit form is expanded. */
   @state() private showForm = false;
+  /** Current table page (1-based). */
+  @state() private page = 1;
+
+  private readonly pageSize = 10;
+
+  /** The slice of employees visible on the current page. */
+  private get pagedEmployees(): Employee[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.employees.slice(start, start + this.pageSize);
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.refresh();
   }
 
-  /** Reload the list from the localStorage-backed store. */
+  /** Reload the list from the localStorage-backed store, clamping the page. */
   private refresh(): void {
     this.employees = getEmployees();
+    const totalPages = Math.max(1, Math.ceil(this.employees.length / this.pageSize));
+    if (this.page > totalPages) this.page = totalPages;
   }
 
   /** Table columns, including an actions column wired to this instance. */
@@ -283,9 +297,15 @@ export class EmployeesWidget extends LitElement {
       updateEmployee(this.editingId, this.draft);
     } else {
       createEmployee(this.draft);
+      // New record is prepended, so jump to the first page to show it.
+      this.page = 1;
     }
     this.resetForm();
     this.refresh();
+  }
+
+  private handlePageChange(event: CustomEvent<PageChangeDetail>): void {
+    this.page = event.detail.page;
   }
 
   private handleEdit(employee: Employee): void {
@@ -358,12 +378,20 @@ export class EmployeesWidget extends LitElement {
                 Add 20 dummy records
               </app-button>
             </div>`
-          : html`<div class="table-scroll">
-              <app-table
-                .columns=${this.columns}
-                .rows=${this.employees}
-              ></app-table>
-            </div>`}
+          : html`
+              <div class="table-scroll">
+                <app-table
+                  .columns=${this.columns}
+                  .rows=${this.pagedEmployees}
+                ></app-table>
+              </div>
+              <app-pagination
+                .count=${this.employees.length}
+                .pageSize=${this.pageSize}
+                .page=${this.page}
+                @page-change=${this.handlePageChange}
+              ></app-pagination>
+            `}
       </div>
     `;
   }
