@@ -182,9 +182,9 @@ export class AppShell extends LitElement {
       </div>
 
       <section class="widgets">
-        <employees-widget></employees-widget>
-        <departments-widget></departments-widget>
-        <reports-widget></reports-widget>
+        <employees-widget view-all></employees-widget>
+        <departments-widget view-all></departments-widget>
+        <reports-widget view-all></reports-widget>
       </section>
     `;
   }

@@ -1,6 +1,7 @@
-import {LitElement, html, css} from 'lit';
-import {customElement, state} from 'lit/decorators.js';
+import {LitElement, html, css, nothing} from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import {widgetCardStyles} from '../styles/widget-card.styles';
+import {buildHash} from '../router/routes';
 import '../components/ui/app-button';
 import '../components/ui/app-search';
 import type {SearchChangeDetail} from '../components/ui/app-search';
@@ -41,6 +42,31 @@ export class EmployeesWidget extends LitElement {
       font-weight: 700;
     }
 
+      .view-all {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+
+      .view-all:hover {
+        text-decoration: underline;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .actions app-search {
+        flex: 1;
+      }
+
       .body {
         flex: 1;
         display: flex;
@@ -52,6 +78,9 @@ export class EmployeesWidget extends LitElement {
     `,
   ];
 
+  /** Show the "View all" link (only on the dashboard home view). */
+  @property({type: Boolean, attribute: 'view-all'}) viewAll = false;
+
   @state() private query = '';
 
   private handleSearch(event: CustomEvent<SearchChangeDetail>): void {
@@ -62,21 +91,36 @@ export class EmployeesWidget extends LitElement {
     // Placeholder: wire to add-employee flow later.
   }
 
+  private handleViewAll(): void {
+    window.location.hash = buildHash('employees');
+  }
+
   override render() {
     return html`
       <div class="card">
         <div class="header">
           <h2 class="title">Employees</h2>
+          ${this.viewAll
+            ? html`<button
+                type="button"
+                class="view-all"
+                @click=${this.handleViewAll}
+              >
+                View all →
+              </button>`
+            : nothing}
+        </div>
+        <div class="actions">
+          <app-search
+            .value=${this.query}
+            placeholder="Search employees..."
+            label="Search employees"
+            @search-change=${this.handleSearch}
+          ></app-search>
           <app-button variant="primary" @click=${this.handleAdd}>
             Add
           </app-button>
         </div>
-        <app-search
-          .value=${this.query}
-          placeholder="Search employees..."
-          label="Search employees"
-          @search-change=${this.handleSearch}
-        ></app-search>
         <div class="body">Employee list goes here</div>
       </div>
     `;
