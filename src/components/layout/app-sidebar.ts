@@ -50,8 +50,8 @@ export class AppSidebar extends LitElement {
       color: var(--color-primary);
     }
 
-    /* Mobile: behave as an off-canvas drawer slid in from the left. */
-    @media (max-width: 768px) {
+    /* Tablet and below: behave as an off-canvas drawer slid in from the left. */
+    @media (max-width: 1024px) {
       :host {
         position: fixed;
         top: 0;

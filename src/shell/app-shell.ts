@@ -29,7 +29,7 @@ export class AppShell extends LitElement {
     .body {
       flex: 1;
       display: grid;
-      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-columns: 200px minmax(0, 1fr);
     }
 
     .main {
@@ -105,10 +105,11 @@ export class AppShell extends LitElement {
       background: var(--color-overlay);
     }
 
-    /* Tablet: Employees spans the top row, other two share the row below. */
+    /* Tablet: hide the sidebar (it becomes an off-canvas drawer) so the main
+       content uses the full width; Employees spans the top row. */
     @media (max-width: 1024px) {
       .body {
-        grid-template-columns: 200px minmax(0, 1fr);
+        grid-template-columns: 1fr;
       }
 
       .widgets {
@@ -120,12 +121,8 @@ export class AppShell extends LitElement {
       }
     }
 
-    /* Mobile: single column; sidebar becomes an off-canvas drawer. */
+    /* Mobile: single-column widgets. */
     @media (max-width: 768px) {
-      .body {
-        grid-template-columns: 1fr;
-      }
-
       .greeting {
         flex-direction: column;
         align-items: flex-start;
@@ -140,8 +137,8 @@ export class AppShell extends LitElement {
       }
     }
 
-    /* Backdrop only matters on mobile. */
-    @media (min-width: 769px) {
+    /* Backdrop only matters while the drawer can appear (tablet and below). */
+    @media (min-width: 1025px) {
       .backdrop {
         display: none;
       }

@@ -175,19 +175,20 @@ export class AppTopbar extends LitElement {
       font-weight: 700;
     }
 
-    /* Tablet: sidebar covers navigation, so drop the inline top nav. */
+    /* Tablet: the sidebar collapses to a drawer, so drop the inline top nav
+       and surface the menu button to open it. */
     @media (max-width: 1024px) {
       .top-nav {
         display: none;
       }
-    }
 
-    /* Mobile: show the menu button, hide the search field. */
-    @media (max-width: 768px) {
       .menu-btn {
         display: inline-flex;
       }
+    }
 
+    /* Mobile: hide the search field and brand name to save room. */
+    @media (max-width: 768px) {
       .search {
         display: none;
       }
