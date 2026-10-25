@@ -3,18 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HR Portal — Employee Management</title>
+    <title>Movie Card Demo</title>
     <!-- Global CSS variables: the single place to control the app's theme. -->
     <link rel="stylesheet" href="./src/styles/variables.css" />
-    <!--
-      Font Awesome (free). Loaded globally so its @font-face is registered at
-      the document level — @font-face reaches into shadow DOM, so <app-icon>
-      can render glyphs with the Font Awesome font inside its own shadow root.
-    -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
     <style>
       html,
       body {
@@ -25,11 +16,21 @@
         font-family: var(--font-sans);
         background: var(--color-bg);
         color: var(--color-text);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 48px 16px;
       }
     </style>
     <script type="module" src="./dist/main.js"></script>
   </head>
   <body>
-    <app-shell></app-shell>
+    <movie-card
+      poster="https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg"
+      title="Inception"
+      year="2010"
+      genre="Sci-Fi"
+      rating="8.8"
+    ></movie-card>
   </body>
 </html>
