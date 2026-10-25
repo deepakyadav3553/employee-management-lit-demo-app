@@ -63,12 +63,23 @@ export class MovieCard extends LitElement {
     }
 
     /* ---------- Add a movie form ---------- */
+    .add-section {
+      padding: 24px;
+      margin-bottom: 48px;
+      background: #f7f7f7;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+
+    .add-section h2 {
+      margin-bottom: 20px;
+    }
+
     .form {
       display: flex;
       flex-direction: column;
       gap: 18px;
       max-width: 440px;
-      margin-bottom: 48px;
     }
 
     .field {
@@ -317,7 +328,7 @@ export class MovieCard extends LitElement {
 
   private renderForm() {
     return html`
-      <section>
+      <section class="add-section">
         <h2>Add a movie</h2>
         <form class="form" @submit=${this.addMovie}>
           <div class="field">
