@@ -177,6 +177,7 @@ export class MovieCard extends LitElement {
     table {
       width: 100%;
       border-collapse: collapse;
+      border: 1px solid var(--color-border);
     }
 
     thead th {
@@ -185,6 +186,7 @@ export class MovieCard extends LitElement {
       font-size: 13px;
       font-weight: 700;
       color: var(--color-text);
+      border: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-text);
     }
 
@@ -192,7 +194,7 @@ export class MovieCard extends LitElement {
       padding: 16px;
       font-size: 14px;
       color: var(--color-text);
-      border-bottom: 1px solid var(--color-border);
+      border: 1px solid var(--color-border);
     }
 
     tbody tr:hover {
