@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Movie Card Demo</title>
+    <title>Coding exercise — Movie Card</title>
     <!-- Global CSS variables: the single place to control the app's theme. -->
     <link rel="stylesheet" href="./src/styles/variables.css" />
     <style>
@@ -14,23 +14,13 @@
       }
       body {
         font-family: var(--font-sans);
-        background: var(--color-bg);
+        background: var(--color-surface);
         color: var(--color-text);
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 48px 16px;
       }
     </style>
     <script type="module" src="./dist/main.js"></script>
   </head>
   <body>
-    <movie-card
-      poster="https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg"
-      title="Inception"
-      year="2010"
-      genre="Sci-Fi"
-      rating="8.8"
-    ></movie-card>
+    <movie-card></movie-card>
   </body>
 </html>
