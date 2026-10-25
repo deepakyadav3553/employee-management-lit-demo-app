@@ -16,14 +16,15 @@ export default {
   // report to ./coverage and enforces the thresholds below.
   coverageConfig: {
     include: ['src/**/*.ts'],
-    exclude: ['src/**/*.test.ts', 'src/test/**'],
+    // main.ts is the demo bootstrap (a host shell), not the reusable component.
+    exclude: ['src/**/*.test.ts', 'src/test/**', 'src/main.ts'],
     report: true,
     reportDir: 'coverage',
     threshold: {
-      statements: 80,
-      branches: 80,
-      functions: 80,
-      lines: 80,
+      statements: 90,
+      branches: 90,
+      functions: 90,
+      lines: 90,
     },
   },
 
