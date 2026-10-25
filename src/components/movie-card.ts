@@ -19,36 +19,19 @@ const RATINGS = [
   '5 - Excellent',
 ];
 
-/** Seed data — mirrors the Figma ("John Doe / The Jungle Book / 4 - Good / Yes"
- *  plus enough rows to make the "1-5 of 20" pager meaningful). */
+/** Seed data — mirrors the Figma ("John Doe / The Jungle Book / 4 - Good / Yes")
+ *  with five starter rows. */
 const SEED: Movie[] = [
   {employee: 'John Doe', movie: 'The Jungle Book', rating: '4 - Good', recommended: true},
   {employee: 'Jane Smith', movie: 'Inception', rating: '5 - Excellent', recommended: true},
   {employee: 'Alan Turing', movie: 'The Matrix', rating: '5 - Excellent', recommended: true},
   {employee: 'Ada Lovelace', movie: 'Interstellar', rating: '4 - Good', recommended: true},
   {employee: 'Grace Hopper', movie: 'Arrival', rating: '4 - Good', recommended: false},
-  {employee: 'Linus Nilsson', movie: 'The Lion King', rating: '3 - OK', recommended: false},
-  {employee: 'Maria Garcia', movie: 'Parasite', rating: '5 - Excellent', recommended: true},
-  {employee: 'Omar Hassan', movie: 'Dune', rating: '4 - Good', recommended: true},
-  {employee: 'Wei Chen', movie: 'Spirited Away', rating: '5 - Excellent', recommended: true},
-  {employee: 'Ingrid Berg', movie: 'Frozen', rating: '3 - OK', recommended: false},
-  {employee: 'Paolo Rossi', movie: 'The Godfather', rating: '5 - Excellent', recommended: true},
-  {employee: 'Sofia Lind', movie: 'Toy Story', rating: '4 - Good', recommended: true},
-  {employee: 'Noah Kim', movie: 'Oppenheimer', rating: '4 - Good', recommended: true},
-  {employee: 'Emma Wilson', movie: 'La La Land', rating: '3 - OK', recommended: false},
-  {employee: 'Lucas Meyer', movie: 'Gladiator', rating: '4 - Good', recommended: true},
-  {employee: 'Olivia Brown', movie: 'Coco', rating: '5 - Excellent', recommended: true},
-  {employee: 'Hugo Lund', movie: 'Tenet', rating: '2 - Bad', recommended: false},
-  {employee: 'Mia Johansson', movie: 'Up', rating: '4 - Good', recommended: true},
-  {employee: 'Leo Andersson', movie: 'Joker', rating: '3 - OK', recommended: false},
-  {employee: 'Freja Holm', movie: 'Soul', rating: '4 - Good', recommended: true},
 ];
 
-const PAGE_SIZE_OPTIONS = [5, 10, 20];
-
 /**
- * "Coding exercise" movie widget — an Add-a-movie form plus a paginated movie
- * list, matching the Figma design.
+ * "Coding exercise" movie widget — an Add-a-movie form plus a movie list,
+ * matching the Figma design.
  *
  * Self-contained: holds its own in-memory list state. On desktop the list is a
  * four-column table; below 640px it collapses into expandable cards where each
@@ -211,62 +194,6 @@ export class MovieCard extends LitElement {
       color: var(--color-text-muted);
     }
 
-    /* ---------- Pagination ---------- */
-    .pager {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 20px;
-      margin-top: 16px;
-      padding: 8px 4px;
-      font-size: 13px;
-      color: var(--color-text-muted);
-    }
-
-    .pager .per-page {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .pager select {
-      width: auto;
-      height: 32px;
-      padding: 0 28px 0 10px;
-    }
-
-    .pager .per-page .select-wrap .chevron {
-      right: 8px;
-    }
-
-    .pager-buttons {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .pager-buttons button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border: none;
-      border-radius: var(--radius-sm);
-      background: transparent;
-      color: var(--color-text);
-      cursor: pointer;
-    }
-
-    .pager-buttons button:hover:not(:disabled) {
-      background: var(--color-surface-hover);
-    }
-
-    .pager-buttons button:disabled {
-      color: var(--color-text-subtle);
-      cursor: not-allowed;
-    }
-
     /* ---------- Mobile cards ---------- */
     .cards {
       display: none;
@@ -344,12 +271,6 @@ export class MovieCard extends LitElement {
       .cards {
         display: flex;
       }
-      .pager {
-        justify-content: center;
-      }
-      .pager .per-page {
-        display: none;
-      }
     }
   `;
 
@@ -361,21 +282,8 @@ export class MovieCard extends LitElement {
   @state() private rating = '';
   @state() private recommend = false;
 
-  // Pagination state
-  @state() private page = 0;
-  @state() private pageSize = 5;
-
-  // Which mobile card is expanded (index into the current page), -1 = none.
+  // Which mobile card is expanded (index into the list), -1 = none.
   @state() private expanded = 0;
-
-  private get totalPages(): number {
-    return Math.max(1, Math.ceil(this.movies.length / this.pageSize));
-  }
-
-  private get pageRows(): Movie[] {
-    const start = this.page * this.pageSize;
-    return this.movies.slice(start, start + this.pageSize);
-  }
 
   private get canAdd(): boolean {
     return (
@@ -397,24 +305,12 @@ export class MovieCard extends LitElement {
       },
       ...this.movies,
     ];
-    // Reset the form and jump to the first page to reveal the new entry.
+    // Reset the form and expand the new (first) entry.
     this.employee = '';
     this.movieName = '';
     this.rating = '';
     this.recommend = false;
-    this.page = 0;
     this.expanded = 0;
-  }
-
-  private goToPage(next: number) {
-    this.page = Math.min(Math.max(0, next), this.totalPages - 1);
-    this.expanded = -1;
-  }
-
-  private changePageSize(size: number) {
-    this.pageSize = size;
-    this.page = 0;
-    this.expanded = -1;
   }
 
   // ----- render helpers -----
@@ -494,7 +390,7 @@ export class MovieCard extends LitElement {
           </tr>
         </thead>
         <tbody>
-          ${this.pageRows.map(
+          ${this.movies.map(
             (m) => html`
               <tr>
                 <td>${m.employee}</td>
@@ -517,7 +413,7 @@ export class MovieCard extends LitElement {
           <span>Movie name</span>
           <span></span>
         </div>
-        ${this.pageRows.map((m, i) => {
+        ${this.movies.map((m, i) => {
           const open = this.expanded === i;
           return html`
             <div class="row" ?open=${open}>
@@ -553,68 +449,6 @@ export class MovieCard extends LitElement {
     `;
   }
 
-  private renderPager() {
-    const total = this.movies.length;
-    const start = total === 0 ? 0 : this.page * this.pageSize + 1;
-    const end = Math.min(total, (this.page + 1) * this.pageSize);
-    const first = this.page === 0;
-    const last = this.page >= this.totalPages - 1;
-    return html`
-      <div class="pager">
-        <div class="per-page">
-          <span>items per page</span>
-          <div class="select-wrap">
-            <select
-              .value=${String(this.pageSize)}
-              @change=${(e: Event) =>
-                this.changePageSize(
-                  Number((e.target as HTMLSelectElement).value)
-                )}
-            >
-              ${PAGE_SIZE_OPTIONS.map(
-                (n) => html`<option value=${n}>${n}</option>`
-              )}
-            </select>
-            ${this.chevron()}
-          </div>
-        </div>
-
-        <span>${start}–${end} of ${total}</span>
-
-        <div class="pager-buttons">
-          <button
-            aria-label="First page"
-            ?disabled=${first}
-            @click=${() => this.goToPage(0)}
-          >
-            ${this.pageIcon('first')}
-          </button>
-          <button
-            aria-label="Previous page"
-            ?disabled=${first}
-            @click=${() => this.goToPage(this.page - 1)}
-          >
-            ${this.pageIcon('prev')}
-          </button>
-          <button
-            aria-label="Next page"
-            ?disabled=${last}
-            @click=${() => this.goToPage(this.page + 1)}
-          >
-            ${this.pageIcon('next')}
-          </button>
-          <button
-            aria-label="Last page"
-            ?disabled=${last}
-            @click=${() => this.goToPage(this.totalPages - 1)}
-          >
-            ${this.pageIcon('last')}
-          </button>
-        </div>
-      </div>
-    `;
-  }
-
   private chevron() {
     return html`<svg
       class="chevron"
@@ -634,30 +468,6 @@ export class MovieCard extends LitElement {
     </svg>`;
   }
 
-  private pageIcon(kind: 'first' | 'prev' | 'next' | 'last') {
-    const s = 16;
-    const stroke = html`stroke="currentColor" stroke-width="1.5"
-      stroke-linecap="round" stroke-linejoin="round"`;
-    switch (kind) {
-      case 'first':
-        return html`<svg width=${s} height=${s} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M10 4L6 8l4 4" ${stroke} /><path d="M4 4v8" ${stroke} />
-        </svg>`;
-      case 'prev':
-        return html`<svg width=${s} height=${s} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M10 4L6 8l4 4" ${stroke} />
-        </svg>`;
-      case 'next':
-        return html`<svg width=${s} height=${s} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M6 4l4 4-4 4" ${stroke} />
-        </svg>`;
-      case 'last':
-        return html`<svg width=${s} height=${s} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M6 4l4 4-4 4" ${stroke} /><path d="M12 4v8" ${stroke} />
-        </svg>`;
-    }
-  }
-
   override render() {
     return html`
       ${this.renderForm()}
@@ -665,7 +475,7 @@ export class MovieCard extends LitElement {
         <h2>Movie list</h2>
         ${this.movies.length === 0
           ? html`<div class="empty">No movies yet. Add one above.</div>`
-          : html`${this.renderTable()}${this.renderCards()}${this.renderPager()}`}
+          : html`${this.renderTable()}${this.renderCards()}`}
       </section>
     `;
   }
