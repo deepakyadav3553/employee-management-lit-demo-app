@@ -2,16 +2,11 @@ import {html, fixture, expect, oneEvent} from '@open-wc/testing';
 import './movie-card';
 import {DEFAULT_RATINGS, type Movie, type MovieCard} from './movie-card';
 
-/** Two sample entries used across the display tests. */
 const sampleMovies: Movie[] = [
   {employee: 'Alice', movie: 'Movie One', rating: '4 - Good', recommended: true},
   {employee: 'Bob', movie: 'Movie Two', rating: '3 - OK', recommended: false},
 ];
 
-/**
- * Fill the form through the real inputs (value + native event) so the
- * component's bindings run, mirroring how a user would interact.
- */
 const fillForm = async (
   element: MovieCard,
   employeeName: string,
@@ -76,7 +71,6 @@ describe('movie-card', () => {
 
     const defaultOptions =
       element.shadowRoot!.querySelectorAll('#rating option');
-    // +1 for the disabled placeholder option.
     expect(defaultOptions.length).to.equal(DEFAULT_RATINGS.length + 1);
 
     element.ratings = ['Low', 'High'];

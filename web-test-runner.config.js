@@ -4,7 +4,6 @@ export default {
   files: 'src/**/*.test.ts',
   nodeResolve: true,
 
-  // Mocha is the built-in test framework for @web/test-runner.
   testFramework: {
     config: {
       ui: 'bdd',
@@ -12,11 +11,8 @@ export default {
     },
   },
 
-  // Code coverage (Istanbul). `npm run test:coverage` writes an HTML
-  // report to ./coverage and enforces the thresholds below.
   coverageConfig: {
     include: ['src/**/*.ts'],
-    // main.ts is the demo bootstrap (a host shell), not the reusable component.
     exclude: ['src/**/*.test.ts', 'src/test/**', 'src/main.ts'],
     report: true,
     reportDir: 'coverage',

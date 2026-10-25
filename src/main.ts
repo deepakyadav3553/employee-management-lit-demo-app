@@ -1,10 +1,3 @@
-/**
- * Demo host for <movie-card>.
- *
- * Shows the controlled-component pattern: the host owns the data, passes it in
- * via the `movies` property, and listens for the `movie-add` event to update
- * that data. The component itself stays dumb and framework-agnostic.
- */
 import './components/movie-card';
 import type {Movie, MovieCard} from './components/movie-card';
 

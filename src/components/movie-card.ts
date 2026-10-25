@@ -1,12 +1,6 @@
 import {LitElement, html, css, nothing, type TemplateResult} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 
-/**
- * A single movie entry.
- *
- * `rating` is stored as the display label (e.g. "4 - Good") so the component
- * stays agnostic about how the host scores movies.
- */
 export interface Movie {
   employee: string;
   movie: string;
@@ -14,7 +8,6 @@ export interface Movie {
   recommended: boolean;
 }
 
-/** Default options for the "Rate the movie" select. Override via `.ratings`. */
 export const DEFAULT_RATINGS: readonly string[] = [
   '1 - Terrible',
   '2 - Bad',
@@ -23,76 +16,14 @@ export const DEFAULT_RATINGS: readonly string[] = [
   '5 - Excellent',
 ];
 
-/**
- * `<movie-card>` — a framework-agnostic, presentational movie widget.
- *
- * It renders an "Add a movie" form plus a movie list (a bordered table on wide
- * viewports, expandable cards below 640px). It is a **dumb / controlled**
- * component: it never owns the data.
- *
- * ## Data in (properties — set as JS properties, not attributes)
- * - `movies: Movie[]`   The list to render. Default `[]`.
- * - `ratings: string[]` Options for the rating select. Default `DEFAULT_RATINGS`.
- * - `formTitle` / `listTitle` Section headings (for i18n / reuse).
- *
- * ## Changes out (events)
- * - `movie-add` — `CustomEvent<Movie>` fired when the form is submitted.
- *   Bubbles and is `composed`, so any outer shell or framework can listen.
- *   The component clears the form but does **not** touch `movies`; the host
- *   appends the entry and passes the new array back in.
- *
- * ## Theming (CSS custom properties, all optional)
- * `--mc-font`, `--mc-text`, `--mc-text-muted`, `--mc-text-subtle`,
- * `--mc-surface`, `--mc-surface-muted`, `--mc-border`, `--mc-border-strong`,
- * `--mc-radius-sm`, `--mc-radius-lg`, `--mc-accent`, `--mc-button-bg`,
- * `--mc-button-bg-hover`, `--mc-button-text`. Each has a built-in fallback,
- * so the component looks right with no external stylesheet.
- *
- * @fires movie-add - A movie was submitted via the form. `detail` is the `Movie`.
- *
- * @example Plain HTML
- * ```html
- * <movie-card></movie-card>
- * <script type="module">
- *   const el = document.querySelector('movie-card');
- *   el.movies = [{employee: 'John Doe', movie: 'Dune', rating: '4 - Good', recommended: true}];
- *   el.addEventListener('movie-add', (e) => { el.movies = [e.detail, ...el.movies]; });
- * </script>
- * ```
- *
- * @example React
- * ```tsx
- * <movie-card
- *   ref={el => { if (el) el.movies = movies; }}
- *   onmovie-add={e => setMovies(m => [e.detail, ...m])}
- * />
- * ```
- */
 @customElement('movie-card')
 export class MovieCard extends LitElement {
   static override styles = css`
     :host {
-      /* Theming tokens — each falls back to the host app's token, then to a
-         hard default, so the component is self-sufficient anywhere. */
-      --_font: var(--mc-font, var(--font-sans, 'Segoe UI', system-ui, sans-serif));
-      --_text: var(--mc-text, var(--color-text, #1f2933));
-      --_text-muted: var(--mc-text-muted, var(--color-text-muted, #64748b));
-      --_text-subtle: var(--mc-text-subtle, var(--color-text-subtle, #94a3b8));
-      --_surface: var(--mc-surface, var(--color-surface, #ffffff));
-      --_surface-muted: var(--mc-surface-muted, #f7f7f7);
-      --_border: var(--mc-border, var(--color-border, #e2e8f0));
-      --_border-strong: var(--mc-border-strong, var(--color-text, #1f2933));
-      --_radius-sm: var(--mc-radius-sm, var(--radius-sm, 8px));
-      --_radius-lg: var(--mc-radius-lg, var(--radius-lg, 16px));
-      --_accent: var(--mc-accent, var(--color-primary, #4f46e5));
-      --_button-bg: var(--mc-button-bg, #111111);
-      --_button-bg-hover: var(--mc-button-bg-hover, #2b2b2b);
-      --_button-text: var(--mc-button-text, #ffffff);
-
       display: block;
       box-sizing: border-box;
-      font-family: var(--_font);
-      color: var(--_text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #1f2933;
     }
 
     *,
@@ -107,13 +38,12 @@ export class MovieCard extends LitElement {
       font-weight: 700;
     }
 
-    /* ---------- Add a movie form ---------- */
     .add-section {
       padding: 24px;
       margin-bottom: 48px;
-      background: var(--_surface-muted);
-      border: 1px solid var(--_border);
-      border-radius: var(--_radius-lg);
+      background: #f7f7f7;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
     }
 
     .add-section h2 {
@@ -136,7 +66,7 @@ export class MovieCard extends LitElement {
     label {
       font-size: 13px;
       font-weight: 600;
-      color: var(--_text);
+      color: #1f2933;
     }
 
     input[type='text'],
@@ -144,18 +74,18 @@ export class MovieCard extends LitElement {
       width: 100%;
       height: 44px;
       padding: 0 12px;
-      border: 1px solid var(--_border);
-      border-radius: var(--_radius-sm);
-      background: var(--_surface);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #ffffff;
       font: inherit;
       font-size: 14px;
-      color: var(--_text);
+      color: #1f2933;
     }
 
     input[type='text']:focus,
     select:focus {
       outline: none;
-      border-color: var(--_text);
+      border-color: #1f2933;
     }
 
     .select-wrap {
@@ -175,7 +105,7 @@ export class MovieCard extends LitElement {
       right: 12px;
       transform: translateY(-50%);
       pointer-events: none;
-      color: var(--_text-muted);
+      color: #64748b;
     }
 
     .checkbox {
@@ -189,7 +119,7 @@ export class MovieCard extends LitElement {
     .checkbox input {
       width: 18px;
       height: 18px;
-      accent-color: var(--_text);
+      accent-color: #1f2933;
       cursor: pointer;
     }
 
@@ -198,9 +128,9 @@ export class MovieCard extends LitElement {
       min-width: 110px;
       padding: 11px 24px;
       border: none;
-      border-radius: var(--_radius-sm);
-      background: var(--_button-bg);
-      color: var(--_button-text);
+      border-radius: 8px;
+      background: #111111;
+      color: #ffffff;
       font: inherit;
       font-size: 14px;
       font-weight: 600;
@@ -209,7 +139,7 @@ export class MovieCard extends LitElement {
     }
 
     .add-btn:hover {
-      background: var(--_button-bg-hover);
+      background: #2b2b2b;
     }
 
     .add-btn:disabled {
@@ -217,11 +147,10 @@ export class MovieCard extends LitElement {
       cursor: not-allowed;
     }
 
-    /* ---------- Movie list (table) ---------- */
     table {
       width: 100%;
       border-collapse: collapse;
-      border: 1px solid var(--_border);
+      border: 1px solid #e2e8f0;
     }
 
     thead th {
@@ -229,31 +158,30 @@ export class MovieCard extends LitElement {
       padding: 12px 16px;
       font-size: 13px;
       font-weight: 700;
-      color: var(--_text);
-      border: 1px solid var(--_border);
-      border-bottom: 1px solid var(--_border-strong);
+      color: #1f2933;
+      border: 1px solid #e2e8f0;
+      border-bottom: 1px solid #1f2933;
     }
 
     tbody td {
       padding: 16px;
       font-size: 14px;
-      color: var(--_text);
-      border: 1px solid var(--_border);
+      color: #1f2933;
+      border: 1px solid #e2e8f0;
     }
 
     tbody tr:hover {
-      background: var(--_surface-muted);
+      background: #f7f7f7;
     }
 
     .empty {
       padding: 32px 16px;
       text-align: center;
-      color: var(--_text-muted);
-      border: 1px solid var(--_border);
-      border-radius: var(--_radius-sm);
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
     }
 
-    /* ---------- Mobile cards ---------- */
     .cards {
       display: none;
       flex-direction: column;
@@ -266,11 +194,11 @@ export class MovieCard extends LitElement {
       padding: 16px 4px;
       font-size: 13px;
       font-weight: 700;
-      border-bottom: 1px solid var(--_border-strong);
+      border-bottom: 1px solid #1f2933;
     }
 
     .row {
-      border-bottom: 1px solid var(--_border);
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .row-summary {
@@ -285,14 +213,14 @@ export class MovieCard extends LitElement {
       font: inherit;
       font-size: 14px;
       text-align: left;
-      color: var(--_text);
+      color: #1f2933;
       cursor: pointer;
     }
 
     .row-summary .toggle {
       display: inline-flex;
       justify-content: flex-end;
-      color: var(--_text-muted);
+      color: #64748b;
       transition: transform 0.2s ease;
     }
 
@@ -309,12 +237,12 @@ export class MovieCard extends LitElement {
 
     .detail-label {
       font-size: 12px;
-      color: var(--_text-muted);
+      color: #64748b;
     }
 
     .detail-value {
       font-size: 15px;
-      color: var(--_text);
+      color: #1f2933;
     }
 
     @media (max-width: 640px) {
@@ -333,25 +261,19 @@ export class MovieCard extends LitElement {
     }
   `;
 
-  /** The movies to render. Owned by the host; set as a JS property. */
   @property({attribute: false}) movies: Movie[] = [];
 
-  /** Options shown in the rating select. */
   @property({attribute: false}) ratings: readonly string[] = DEFAULT_RATINGS;
 
-  /** Heading above the form. */
   @property({attribute: 'form-title'}) formTitle = 'Add a movie';
 
-  /** Heading above the list. */
   @property({attribute: 'list-title'}) listTitle = 'Movie list';
 
-  // ----- transient UI state (local to the component) -----
   @state() private employee = '';
   @state() private movieName = '';
   @state() private rating = '';
   @state() private recommend = false;
 
-  /** Index of the expanded mobile card, -1 = none. */
   @state() private expanded = 0;
 
   private get canAdd(): boolean {
@@ -375,7 +297,6 @@ export class MovieCard extends LitElement {
       recommended: this.recommend,
     };
 
-    // Notify the host; it owns the list and decides what to do with the entry.
     this.dispatchEvent(
       new CustomEvent<Movie>('movie-add', {
         detail: newMovie,
@@ -384,14 +305,11 @@ export class MovieCard extends LitElement {
       })
     );
 
-    // Reset the transient form state.
     this.employee = '';
     this.movieName = '';
     this.rating = '';
     this.recommend = false;
   }
-
-  // ----- render helpers -----
 
   private renderForm(): TemplateResult {
     return html`
